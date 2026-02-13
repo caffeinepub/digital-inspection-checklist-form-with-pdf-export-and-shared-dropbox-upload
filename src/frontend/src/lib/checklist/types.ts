@@ -1,0 +1,70 @@
+export interface ChecklistFormData {
+  roomNumber: string;
+  inspector: string;
+  date: string;
+  unitArea: string;
+  
+  section1: {
+    roomOdor: {
+      checked: boolean;
+      observation: string;
+    };
+    thermostatCheck: {
+      checked: boolean;
+      setTemp: string;
+      matchesActual: 'yes' | 'no' | '';
+    };
+    scaleBuildup: boolean;
+  };
+  
+  section2: {
+    lightSwitches: boolean;
+    bulbs: {
+      checked: boolean;
+      notes: string;
+    };
+    outletSwitchCovers: boolean;
+    gfciOutlets: boolean;
+    noBurnMarks: boolean;
+  };
+  
+  section3: {
+    hotWaterFixtures: {
+      checked: boolean;
+      waterTemp: string;
+    };
+    drainage: boolean;
+    popUpAssembly: boolean;
+    soapDispenser: boolean;
+    toiletFlushTest: {
+      flushOperation: 'yes' | 'no' | '';
+      secureAtBase: 'yes' | 'no' | '';
+      rearCaulkLeakage: 'yes' | 'no' | '';
+    };
+    rearCaulkOpening: boolean;
+    bathroomGFCI: boolean;
+  };
+  
+  section4: {
+    underSinksDry: boolean;
+    floorsFirmDry: boolean;
+    ceilingsWallsClean: boolean;
+    windowsSillsDoorsDry: boolean;
+    behindRefrigeratorDry: boolean;
+    waterHeaterAreaDry: boolean;
+    mainShutOffValve: boolean;
+  };
+  
+  section5: {
+    allFixturesOff: boolean;
+    noWaterRunning: boolean;
+    areaCleanOrderly: boolean;
+  };
+  
+  notesIssues: string;
+  
+  workOrderGuidance: {
+    createWorkOrder: boolean;
+    doNotCreateWO: boolean;
+  };
+}

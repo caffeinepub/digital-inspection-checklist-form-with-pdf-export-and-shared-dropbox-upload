@@ -1,0 +1,64 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-13T04:43:11.643Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 3,
+    "implemented": 3,
+    "items": [
+      {
+        "id": "REQ-10",
+        "summary": "Remove the nested React Query provider so the app uses a single QueryClientProvider (the one already wrapping the app in frontend/src/main.tsx), and ensure all hooks/components use that single provider instance.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-11",
+        "summary": "Make the initial app loading state fail-safe: if Internet Identity initialization remains in the \"initializing\" state longer than a reasonable timeout (e.g., 8–10 seconds), stop blocking the entire UI and render the main app with anonymous access, while showing a clear, dismissible warning banner that authentication initialization is taking longer than expected.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/auth/AuthInitStatusBanner.tsx",
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/auth/AuthInitStatusBanner.tsx",
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-12",
+        "summary": "Add a non-blocking error UI path for authentication initialization failures: when the Internet Identity hook reports a login/initialization error, render the app (do not block on a full-page loader) and show a visible error message with a \"Reload\" action.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/auth/AuthInitStatusBanner.tsx",
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/auth/AuthInitStatusBanner.tsx",
+          "frontend/src/App.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/App.tsx",
+    "frontend/src/components/auth/AuthInitStatusBanner.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

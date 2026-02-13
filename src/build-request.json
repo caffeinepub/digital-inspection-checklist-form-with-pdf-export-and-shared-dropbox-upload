@@ -1,0 +1,77 @@
+{
+  "kind": "build_request",
+  "title": "Fix infinite Loading screen preventing app from rendering",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-10",
+      "text": "Remove the nested React Query provider so the app uses a single QueryClientProvider (the one already wrapping the app in frontend/src/main.tsx), and ensure all hooks/components use that single provider instance.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "App is stuck on the loading screen",
+          "The app doesn't even load.  It just says loading...",
+          "generate a fix"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The app no longer renders an infinite \"Loading...\" screen on initial load on both desktop and mobile.",
+        "There is exactly one QueryClientProvider wrapping the app at runtime (no nested providers causing multiple query clients).",
+        "Core flows still work after the change: Checklist page renders, Login/Logout button renders, and /admin route can be reached (with expected access control behavior)."
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "text": "Make the initial app loading state fail-safe: if Internet Identity initialization remains in the \"initializing\" state longer than a reasonable timeout (e.g., 8–10 seconds), stop blocking the entire UI and render the main app with anonymous access, while showing a clear, dismissible warning banner that authentication initialization is taking longer than expected.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "the app doesn't even load at all.  no error message..  This happens on both mobile and desktop"
+        ]
+      },
+      "acceptanceCriteria": [
+        "If the auth initialization does not complete within the timeout, the Checklist page renders instead of staying on the blocking loading screen.",
+        "The user sees English UI text explaining that sign-in initialization is delayed, and can still use the app anonymously (where permitted).",
+        "If auth initialization later completes successfully, the banner disappears and the authenticated state updates without requiring a hard refresh."
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "text": "Add a non-blocking error UI path for authentication initialization failures: when the Internet Identity hook reports a login/initialization error, render the app (do not block on a full-page loader) and show a visible error message with a \"Reload\" action.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "no error message.."
+        ]
+      },
+      "acceptanceCriteria": [
+        "When authentication initialization fails, the app does not get stuck behind \"Loading...\".",
+        "An English error message is visible (not only in console), and a reload button is available.",
+        "Normal unauthenticated usage remains possible (e.g., viewing and filling the checklist) even if auth init fails."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not modify files in frontend immutablePaths, including frontend/src/main.tsx and frontend/src/hooks/useInternetIdentity.ts.",
+    "Keep the backend as a single Motoko actor; no new backend services.",
+    "All user-facing text must be in English."
+  ],
+  "nonGoals": [
+    "Adding new product features unrelated to the loading issue (e.g., new checklist fields, new admin capabilities).",
+    "Changing Internet Identity implementation details inside frontend/src/hooks/useInternetIdentity.ts (immutable).",
+    "Backend schema migrations unless a concrete state incompatibility is discovered during implementation."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

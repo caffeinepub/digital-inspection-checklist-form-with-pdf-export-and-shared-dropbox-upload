@@ -1,0 +1,65 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix infinite Loading screen and make auth initialization non-blocking",
+  "requirements": [
+    {
+      "id": "REQ-10",
+      "summary": "Remove nested React Query provider and ensure the app uses the single QueryClientProvider from frontend/src/main.tsx",
+      "acceptanceCriteria": [
+        "The app no longer renders an infinite \"Loading...\" screen on initial load on both desktop and mobile.",
+        "There is exactly one QueryClientProvider wrapping the app at runtime (no nested providers causing multiple query clients).",
+        "Core flows still work after the change: Checklist page renders, Login/Logout button renders, and /admin route can be reached (with expected access control behavior)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Remove the local QueryClient and nested QueryClientProvider so App relies on the single QueryClientProvider already defined in frontend/src/main.tsx. Clean up related imports and ensure all existing hooks/components (e.g., useQueryClient usage in Header/useActor/useQueries) continue to consume the same provider instance."
+        }
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "summary": "Add a fail-safe timeout for auth initialization and show a dismissible warning banner while allowing anonymous app usage",
+      "acceptanceCriteria": [
+        "If the auth initialization does not complete within the timeout, the Checklist page renders instead of staying on the blocking loading screen.",
+        "The user sees English UI text explaining that sign-in initialization is delayed, and can still use the app anonymously (where permitted).",
+        "If auth initialization later completes successfully, the banner disappears and the authenticated state updates without requiring a hard refresh."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/auth/AuthInitStatusBanner.tsx",
+          "operation": "create",
+          "description": "Create a small, dismissible banner component for auth initialization status messages (warning state) that can be shown without blocking the app UI. Include clear English copy for the delayed-initialization case and support a local dismiss action."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Replace the full-page blocking loader logic based solely on isInitializing with a timeout-driven approach (~8–10 seconds). Before the timeout, keep the current lightweight loading UI; after the timeout, render the main app (RouterProvider) with anonymous access and display the new dismissible warning banner. Ensure the banner auto-hides when initialization later completes (and authenticated state updates naturally through existing hooks)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "summary": "Add a non-blocking error UI for authentication initialization failures with a visible message and Reload action",
+      "acceptanceCriteria": [
+        "When authentication initialization fails, the app does not get stuck behind \"Loading...\".",
+        "An English error message is visible (not only in console), and a reload button is available.",
+        "Normal unauthenticated usage remains possible (e.g., viewing and filling the checklist) even if auth init fails."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/auth/AuthInitStatusBanner.tsx",
+          "operation": "modify",
+          "description": "Extend the banner component to support an error state that displays an English authentication initialization failure message and a \"Reload\" action that refreshes the page. Keep the banner non-blocking and dismissible."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Use the immutable useInternetIdentity hook’s isLoginError/loginError signals to avoid full-page blocking UI when auth initialization fails. Always render the main app content (RouterProvider) and show the error banner with a Reload action when auth init is in an error state; ensure checklist remains usable anonymously while the error banner is visible."
+        }
+      ]
+    }
+  ]
+}

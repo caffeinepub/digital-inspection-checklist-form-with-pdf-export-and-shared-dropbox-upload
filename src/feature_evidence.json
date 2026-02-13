@@ -1,0 +1,67 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-remove-the-nested-react-query-provider-so-the-app-uses-a-single-queryclientprovider-the-one-already-wrapping-the-app-in-frontend-src-main-tsx-and-ensure-all-hooks-components-use-that-single-provider-instance",
+      "featureTitle": "Remove the nested React Query provider so the app uses a single QueryClientProvider (the one already wrapping the app in frontend/src/main.tsx), and ensure all hooks/components use that single provider instance.",
+      "files": [
+        "frontend/src/App.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "http-outcalls@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-10"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-make-the-initial-app-loading-state-fail-safe-if-internet-identity-initialization-remains-in-the-initializing-state-longer-than-a-reasonable-timeout-e-g-8-10-seconds-stop-blocking-the-entire-ui-and-render-the-main-app-with-anonymous-access-while-showing-a-clear-dismissible-warning-banner-that-authentication-initialization-is-taking-longer-than-expected",
+      "featureTitle": "Make the initial app loading state fail-safe: if Internet Identity initialization remains in the \"initializing\" state longer than a reasonable timeout (e.g., 8–10 seconds), stop blocking the entire UI and render the main app with anonymous access, while showing a clear, dismissible warning banner that authentication initialization is taking longer than expected.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/auth/AuthInitStatusBanner.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "http-outcalls@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-11"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-non-blocking-error-ui-path-for-authentication-initialization-failures-when-the-internet-identity-hook-reports-a-login-initialization-error-render-the-app-do-not-block-on-a-full-page-loader-and-show-a-visible-error-message-with-a-reload-action",
+      "featureTitle": "Add a non-blocking error UI path for authentication initialization failures: when the Internet Identity hook reports a login/initialization error, render the app (do not block on a full-page loader) and show a visible error message with a \"Reload\" action.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/auth/AuthInitStatusBanner.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "http-outcalls@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-12"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

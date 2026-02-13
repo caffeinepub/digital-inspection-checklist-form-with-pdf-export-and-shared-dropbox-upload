@@ -1,0 +1,23 @@
+{
+  "frontend/src/App.tsx": "Main application component with routing, Internet Identity integration with timeout-based non-blocking initialization using the isLoginError helper, user profile setup modal, and theme provider configuration.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including user profiles, admin role checks, Dropbox token management, and Dropbox configuration status.",
+  "frontend/src/pages/ChecklistFormPage.tsx": "Complete digital inspection checklist form matching the existing type definitions with all five sections (Entry, Lighting, Bathroom, Moisture/Structural, Final Checks), mobile-safe PDF generation and download with fallback \"Open PDF\" button, and inline Dropbox upload implementation.",
+  "frontend/src/pages/AdminSettingsPage.tsx": "Admin-only settings page for configuring the shared Dropbox access token with save/error states and masked token display.",
+  "frontend/src/components/layout/Header.tsx": "Application header with navigation, login/logout button, and conditional Admin button (with Settings icon) for authenticated admins that routes to /admin.",
+  "frontend/src/components/layout/Footer.tsx": "Application footer with copyright, branding attribution, and Caffeine.ai link with UTM tracking.",
+  "frontend/src/components/checklist/ChecklistSection.tsx": "Reusable section wrapper component for checklist sections with title, description, separator, and consistent spacing.",
+  "frontend/src/components/checklist/YesNoField.tsx": "Reusable Yes/No radio button field component for bathroom inspection and other binary choice items.",
+  "frontend/src/components/auth/RequireAdmin.tsx": "Guard component that wraps admin-only routes and renders access denied screen for unauthorized users.",
+  "frontend/src/components/auth/AccessDeniedScreen.tsx": "Access denied UI component displayed when non-admin users attempt to access restricted pages.",
+  "frontend/src/components/auth/ProfileSetupModal.tsx": "Modal dialog for first-time user profile setup, prompting authenticated users to enter their name.",
+  "frontend/src/lib/checklist/types.ts": "TypeScript type definitions for the complete checklist form data structure covering all sections and fields.",
+  "frontend/src/lib/checklist/defaults.ts": "Default/initial values factory function for checklist form state ensuring all fields are initialized properly.",
+  "frontend/src/lib/pdf/generateChecklistPdf.ts": "PDF generation function that creates a simplified text-based PDF structure without external libraries, formatting checklist data into a readable PDF document.",
+  "frontend/src/lib/pdf/downloadPdf.ts": "Mobile-safe PDF download helper that creates a Blob URL, attempts download via anchor element, and returns the ObjectURL for fallback actions without immediate revocation; includes a safe URL revocation utility with configurable delay.",
+  "frontend/src/lib/pdf/filename.ts": "Filename sanitization utility that converts room numbers into safe PDF filenames.",
+  "frontend/src/lib/upload/uploadChecklistPdf.ts": "Dropbox upload helper stub that documents the need for component context to access the backend token (functionality moved to ChecklistFormPage).",
+  "frontend/src/index.css": "Global styles with OKLCH color system using emerald/teal theme palette for light and dark modes.",
+  "frontend/tailwind.config.js": "Tailwind configuration with emerald/teal color theme, Inter font family, custom shadows, and extended design tokens.",
+  "frontend/package.json": "Frontend package configuration with pdf-lib dependency added for PDF generation functionality.",
+  "frontend/src/components/auth/AuthInitStatusBanner.tsx": "Dismissible banner component that displays warning or error messages for authentication initialization issues with optional reload action, allowing users to continue using the app anonymously."
+}
