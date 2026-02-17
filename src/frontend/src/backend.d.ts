@@ -38,7 +38,9 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
+    areAdminPrivilegesAvailable(): Promise<boolean>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    claimAdminPrivileges(): Promise<void>;
     getAllSortedByRoom(): Promise<Array<PdfEntry>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;

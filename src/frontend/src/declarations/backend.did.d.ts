@@ -28,7 +28,9 @@ export type UserRole = { 'admin' : null } |
   { 'guest' : null };
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'areAdminPrivilegesAvailable' : ActorMethod<[], boolean>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'claimAdminPrivileges' : ActorMethod<[], undefined>,
   'getAllSortedByRoom' : ActorMethod<[], Array<PdfEntry>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,

@@ -1,193 +1,106 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Digital inspection checklist form with PDF export and shared Dropbox upload",
+  "title": "Safety Inspection — Stabilize initial load, add admin-claim CTA, and harden Dropbox upload UX",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Build a two-page fillable inspection checklist form matching the uploaded checklist’s section order and fields.",
+      "summary": "Eliminate initial-render runtime crashes and ensure the app always renders Checklist or a readable error screen.",
       "acceptanceCriteria": [
-        "The UI contains the checklist title/header area with inputs for Inspector, Date, and Unit/Area (as shown in the images).",
-        "The UI includes checklist sections in the same order as the images (e.g., Entry & Initial Conditions; Lighting & Electrical; Bathroom Inspection; Water, Mold & Moisture Checks; Final Walk-Through & Exit; Notes/Issues Identified; Final Work Order Guidance).",
-        "Each checklist line item shown in the uploaded images is represented by an appropriate input (checkbox/radio/text/number) and is editable.",
-        "Bathroom Inspection items shown on page 2 include Yes/No style inputs where present in the images (e.g., Toilet Flush Test sub-items with Yes/No)."
+        "Opening the app in Chrome, Firefox, and Safari renders the main layout (Header + Checklist page) without a blank screen.",
+        "If authentication/actor initialization fails, the UI shows a readable error state instead of crashing.",
+        "No uncaught exceptions are logged during initial app load in the browser console."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ChecklistFormPage.tsx",
-          "operation": "create",
-          "description": "Implement the full two-page Courtesy Safety & Health Inspection Checklist as a fillable form, preserving section order and capturing all fields across both uploaded images. Use shadcn-ui components (e.g., Card, Input, Textarea, Checkbox, RadioGroup, Separator, Button) for consistent form controls and section grouping. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/checklist/ChecklistSection.tsx",
-          "operation": "create",
-          "description": "Create a reusable section wrapper for checklist sections (header, description, divider, spacing) to keep the long form scannable and consistent. Use shadcn-ui components where appropriate (e.g., Card/Separator). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/checklist/YesNoField.tsx",
-          "operation": "create",
-          "description": "Create a reusable Yes/No field control to support Bathroom Inspection sub-items (and any other Yes/No fields) with clear labeling and accessible grouping. Use shadcn-ui RadioGroup if available. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/lib/checklist/types.ts",
-          "operation": "create",
-          "description": "Define TypeScript types for the checklist form state covering all fields (header fields + section items) so the UI and PDF export share a single source of truth."
-        },
-        {
-          "path": "frontend/src/lib/checklist/defaults.ts",
-          "operation": "create",
-          "description": "Provide default/initial values for the checklist form state to ensure all fields are present and editable from first render."
+          "path": "frontend/src/hooks/useActor.ts",
+          "operation": "modify",
+          "description": "Harden actor initialization: catch and surface initialization errors (e.g., access-control initialization, actor creation) instead of letting them throw during React Query execution; expose an explicit actor initialization error state to the app so initial load can render a clear error screen."
         },
         {
           "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add a top-level app initialization/error gate so the RouterProvider never results in a blank screen: if actor/auth bootstrap reports an error, render a dedicated error screen with readable guidance; otherwise render the normal layout (Header + Checklist page). Use the selected \"authorization\" component expectations for Internet Identity initialization and cached data clearing patterns; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/system/InitErrorScreen.tsx",
           "operation": "create",
-          "description": "Wire the checklist form page into the app as the primary user flow, including basic navigation to reach the checklist UI."
+          "description": "Create a reusable, readable initialization error screen (non-crashing UI) that can be shown when auth/actor/router bootstrap fails, including a suggested user action (e.g., retry, log in again)."
+        },
+        {
+          "path": "frontend/src/main.tsx",
+          "operation": "modify",
+          "description": "Wrap the app in a last-resort React error boundary (or equivalent) so unexpected render-time exceptions during initial mount display the InitErrorScreen instead of a blank/sad-face page."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add required Room Number input used as the PDF filename for download and Dropbox upload.",
+      "summary": "Add an in-app admin access claim flow initiated by a button for authenticated users, unlocking /admin without refresh.",
       "acceptanceCriteria": [
-        "The user cannot submit the form without providing a Room Number.",
-        "On successful submission, the generated PDF filename uses the Room Number (e.g., \"<RoomNumber>.pdf\")."
+        "When a user is logged in but not an admin, the Header shows a clear call-to-action to obtain admin access.",
+        "Completing the admin access flow results in the user being recognized as admin (useIsCallerAdmin returns true) without requiring a manual refresh.",
+        "After admin access is granted, the Header shows the existing Admin button and the user can navigate to /admin successfully.",
+        "Non-authenticated users cannot obtain admin access and are prompted to log in first."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ChecklistFormPage.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add a required Room Number field to the form header area; enforce validation that blocks submission until provided; ensure the resulting PDF filename is derived from Room Number for both download and upload actions. Use shadcn-ui Input + inline error messaging patterns as applicable. Verify the component's usage instructions before implementing."
+          "description": "Add React Query hooks/mutations to support the admin-claim flow using existing backend capabilities (areAdminPrivilegesAvailable, claimAdminPrivileges). Ensure successful claim invalidates/refetches admin-related queries so UI updates without refresh. Use the selected \"authorization\" component patterns for role/admin queries and cache invalidation; verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/lib/pdf/filename.ts",
-          "operation": "create",
-          "description": "Centralize filename generation (e.g., sanitization and final \"<RoomNumber>.pdf\" naming) so download and upload consistently use the same Room Number-based filename."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Generate a simplified PDF from the submitted checklist data and trigger an immediate download after submission.",
-      "acceptanceCriteria": [
-        "Submitting a completed form generates a PDF that includes the Room Number, Inspector, Date, Unit/Area, and the checklist responses in readable text form (layout does not need to match the original precisely).",
-        "The user can download the generated PDF to their device after submission.",
-        "The generated PDF content reflects the current values entered into the digital form."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/package.json",
+          "path": "frontend/src/components/layout/Header.tsx",
           "operation": "modify",
-          "description": "Add a client-side PDF generation dependency (e.g., pdf-lib or equivalent) required to build a simplified text-based PDF from the current form state."
+          "description": "Implement the Header CTA for authenticated non-admin users to obtain admin access (and prompt login when unauthenticated). On success, immediately refresh admin status and reveal the existing Admin navigation. Use the selected \"authorization\" component guidance for login/logout and cached data clearing; verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/lib/pdf/generateChecklistPdf.ts",
-          "operation": "create",
-          "description": "Implement simplified PDF generation that renders Room Number, Inspector, Date, Unit/Area, and readable checklist responses derived from the current form state."
-        },
-        {
-          "path": "frontend/src/lib/pdf/downloadPdf.ts",
-          "operation": "create",
-          "description": "Implement a browser download helper that takes the generated PDF bytes and triggers an immediate download using the Room Number-based filename."
-        },
-        {
-          "path": "frontend/src/pages/ChecklistFormPage.tsx",
+          "path": "frontend/src/components/auth/RequireAdmin.tsx",
           "operation": "modify",
-          "description": "On submit: validate required inputs, generate the PDF from current form values, and trigger an immediate download for the user; ensure the PDF content matches the latest UI state at time of submission. Use shadcn-ui Button and a clear submission status area. Verify the component's usage instructions before implementing."
+          "description": "Ensure /admin access behavior cleanly distinguishes: not logged in (prompt to log in), logged in but not admin (show AccessDeniedScreen), and loading states. Keep messaging in English and avoid crashes while admin status is being determined."
         }
       ]
     },
     {
       "id": "REQ-4",
-      "summary": "Add an Admin Settings page UI to save a shared Dropbox access token and show save success/error states without exposing the token.",
+      "summary": "Make Dropbox uploads reliable by retrieving/using the token correctly, improving error messages, and removing invalid component-context usage.",
       "acceptanceCriteria": [
-        "The app includes an Admin Settings screen with a field to paste a Dropbox access token and a Save action.",
-        "The token is persisted in the backend so it remains available after page reloads.",
-        "The UI displays a clear success/error state after saving the token.",
-        "The saved token is not exposed in the UI after saving (e.g., masked display or only \"token is set\" indicator)."
+        "If no Dropbox token is configured, submitting the checklist downloads the PDF and shows a clear message indicating Dropbox is not configured (no attempted upload).",
+        "If a token is configured, submitting the checklist attempts an upload to https://content.dropboxapi.com/2/files/upload and reports success/failure.",
+        "On Dropbox API failure, the UI displays a user-readable failure toast and logs the detailed error text for debugging.",
+        "No code path calls frontend/src/lib/upload/uploadChecklistPdf.ts in a way that throws 'must be called from component context'."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/AdminSettingsPage.tsx",
-          "operation": "create",
-          "description": "Create an Admin Settings screen that allows an admin to paste a Dropbox access token and save it via backend calls. Display clear success/error feedback; after saving, do not display the token (show only a 'token is set' indicator and/or masked state). Use the authorization component’s frontend guidance to gate access and handle authorization errors gracefully. Use shadcn-ui form components for consistent UI. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useAdminStatus.ts",
-          "operation": "create",
-          "description": "Implement a small hook that queries backend admin status (e.g., isCallerAdmin/getCallerUserRole) and exposes loading/authorized/unauthorized states for guarding the Admin Settings page. Use the authorization component patterns for handling unauthorized responses. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/auth/RequireAdmin.tsx",
-          "operation": "create",
-          "description": "Create a guard component to wrap admin-only routes and render a clear access-denied state when not authorized, based on the authorization component’s access control UI guidance. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/auth/AccessDeniedScreen.tsx",
-          "operation": "create",
-          "description": "Provide an Access Denied UI used by RequireAdmin and any other admin-gated surfaces; keep messaging in English and action-oriented (e.g., 'You do not have access to this page'). Use shadcn-ui Card/Button styling if available. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/lib/upload/uploadChecklistPdf.ts",
           "operation": "modify",
-          "description": "Wire the Admin Settings page into app navigation/routing and wrap it with the RequireAdmin guard so it is not accessible to non-admin users."
+          "description": "Refactor uploadChecklistPdf to be a pure utility (no hooks) that accepts the Dropbox token as an argument and returns a structured success/error result (including response text/status) rather than throwing a component-context error."
+        },
+        {
+          "path": "frontend/src/pages/ChecklistFormPage.tsx",
+          "operation": "modify",
+          "description": "Use the refactored uploadChecklistPdf utility and existing token query to drive upload behavior: if token missing, skip upload and show a clear 'Dropbox is not configured' message; if upload fails, show actionable toast text and console-log the detailed Dropbox error body for debugging."
         }
       ]
     },
     {
       "id": "REQ-5",
-      "summary": "Upload the generated PDF to Dropbox after successful submission when a shared token is configured, and surface upload status in the UI.",
+      "summary": "Ensure Admin Settings token configuration works end-to-end with proper admin gating and secure UI behavior.",
       "acceptanceCriteria": [
-        "If a Dropbox token is configured, submitting the form triggers an upload attempt to Dropbox for the generated PDF.",
-        "The upload uses the Room Number-based filename (\"<RoomNumber>.pdf\").",
-        "The UI shows upload status (uploading/success/failure) and does not claim success if the Dropbox API call fails.",
-        "If the Dropbox token is missing, the app still allows PDF download and shows a clear message that Dropbox upload is not configured."
+        "As an admin, saving a token on /admin calls the backend and persists the token (subsequent loads show 'Dropbox token is configured').",
+        "As a non-admin, navigating to /admin shows the access denied UI (no token data is revealed).",
+        "The token is never displayed in plaintext by default in the UI (password-masked input remains the default behavior)."
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/hooks/useDropboxConfiguration.ts",
-          "operation": "create",
-          "description": "Create a hook to check whether Dropbox upload is configured (e.g., via backend getDropboxToken returning null/non-null) without exposing the token value in UI state."
-        },
-        {
-          "path": "frontend/src/lib/upload/uploadChecklistPdf.ts",
-          "operation": "create",
-          "description": "Implement a helper that calls the backend upload capability with Room Number, PDF bytes, and timestamp; return structured success/failure to drive UI status messaging."
-        },
-        {
-          "path": "frontend/src/pages/ChecklistFormPage.tsx",
-          "operation": "modify",
-          "description": "After PDF generation and download, conditionally attempt Dropbox upload when configured. Show explicit upload states (uploading/success/failure) and ensure the UI does not report success when the backend returns an error. If not configured, show a clear message while still completing download."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Apply a cohesive non-blue/non-purple visual theme and improve form scanability with clear section separation.",
-      "acceptanceCriteria": [
-        "The app has a consistent typography, spacing, and component styling suitable for a checklist/inspection workflow.",
-        "Primary color styling is not blue/purple.",
-        "Form sections are visually separated and easy to scan (e.g., section headers, dividers, grouping)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Update global theme tokens (CSS variables/Tailwind base layer) to use a non-blue/non-purple primary palette (e.g., green/teal/orange) and set consistent typography and spacing defaults for a form-heavy workflow."
-        },
-        {
-          "path": "frontend/tailwind.config.js",
-          "operation": "modify",
-          "description": "Adjust Tailwind theme extensions if needed to align with the updated non-blue/non-purple primary palette and consistent section styling (without changing shadcn-ui component source files)."
-        },
-        {
-          "path": "frontend/src/pages/ChecklistFormPage.tsx",
-          "operation": "modify",
-          "description": "Ensure checklist sections are visually separated and easy to scan using consistent headers, dividers, and spacing; rely on composed shadcn-ui components (Card/Separator/typography classes) rather than editing immutable UI component files. Verify the component's usage instructions before implementing."
-        },
         {
           "path": "frontend/src/pages/AdminSettingsPage.tsx",
           "operation": "modify",
-          "description": "Apply the same theme and layout conventions as the checklist page to keep the overall app styling coherent. Use shadcn-ui components where appropriate. Verify the component's usage instructions before implementing."
+          "description": "Tighten end-to-end token UX: keep password-masked input as default, ensure post-save state reliably reflects configuration (via query invalidation/refetch), and present English error messaging that does not leak token content."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Ensure setDropboxToken success invalidates/refetches the Dropbox token query so /admin reflects 'Dropbox token is configured' on subsequent loads and immediately after save."
         }
       ]
     }

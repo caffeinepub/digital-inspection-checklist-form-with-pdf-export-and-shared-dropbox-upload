@@ -1,13 +1,16 @@
 import { createRouter, RouterProvider, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { useGetCallerUserProfile, useSaveCallerUserProfile } from './hooks/useQueries';
+import { useActor } from './hooks/useActor';
 import ChecklistFormPage from './pages/ChecklistFormPage';
 import AdminSettingsPage from './pages/AdminSettingsPage';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import ProfileSetupModal from './components/auth/ProfileSetupModal';
+import InitErrorScreen from './components/system/InitErrorScreen';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from 'next-themes';
+import { Loader2 } from 'lucide-react';
 
 function Layout() {
   return (
@@ -47,8 +50,9 @@ declare module '@tanstack/react-router' {
   }
 }
 
-function App() {
+function AppContent() {
   const { identity } = useInternetIdentity();
+  const { actor, isFetching: actorFetching } = useActor();
   const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
   const { mutate: saveProfile } = useSaveCallerUserProfile();
 
@@ -59,14 +63,39 @@ function App() {
     saveProfile({ name });
   };
 
+  // Show loading state while actor is initializing
+  if (actorFetching && !actor) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+          <p className="text-muted-foreground">Initializing application...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If actor failed to initialize, show error
+  if (!actor && !actorFetching) {
+    return <InitErrorScreen error="Failed to initialize application. Please refresh the page." />;
+  }
+
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <>
       <RouterProvider router={router} />
       <ProfileSetupModal
         open={showProfileSetup}
         onSave={handleProfileSave}
       />
       <Toaster />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <AppContent />
     </ThemeProvider>
   );
 }

@@ -2,15 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-a-two-page-fillable-digital-form-that-recreates-the-uploaded-courtesy-safety-health-inspection-checklist-in-the-same-section-order-as-the-photos-including-all-fields-shown-across-both-uploaded-images",
-      "featureTitle": "Create a two-page fillable digital form that recreates the uploaded “Courtesy Safety & Health Inspection Checklist” in the same section order as the photos, including all fields shown across both uploaded images.",
+      "featureId": "feature-diagnose-and-fix-the-live-app-failing-to-load-across-major-browsers-by-eliminating-any-runtime-errors-during-initial-render-router-mount-auth-initialization-react-query-actor-creation-and-ensuring-the-app-consistently-reaches-the-checklist-page-or-a-clear-error-screen-instead-of-a-blank-sad-face-page",
+      "featureTitle": "Diagnose and fix the live app failing to load across major browsers by eliminating any runtime errors during initial render (router mount, auth initialization, React Query actor creation) and ensuring the app consistently reaches the Checklist page or a clear error screen instead of a blank/sad-face page.",
       "files": [
         "frontend/src/App.tsx",
-        "frontend/src/components/checklist/ChecklistSection.tsx",
-        "frontend/src/components/checklist/YesNoField.tsx",
-        "frontend/src/lib/checklist/defaults.ts",
-        "frontend/src/lib/checklist/types.ts",
-        "frontend/src/pages/ChecklistFormPage.tsx"
+        "frontend/src/components/system/InitErrorScreen.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -27,11 +23,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-required-room-number-selection-input-that-is-used-as-the-pdf-filename-for-both-download-and-dropbox-upload-when-a-submission-is-completed",
-      "featureTitle": "Add a required “Room Number” selection/input that is used as the PDF filename for both download and Dropbox upload when a submission is completed.",
+      "featureId": "feature-add-an-in-app-admin-access-flow-initiated-by-a-button-so-an-authenticated-user-can-obtain-admin-privileges-and-then-access-the-admin-settings-page-to-save-a-dropbox-token",
+      "featureTitle": "Add an in-app admin access flow initiated by a button so an authenticated user can obtain admin privileges and then access the Admin Settings page to save a Dropbox token.",
       "files": [
-        "frontend/src/lib/pdf/filename.ts",
-        "frontend/src/pages/ChecklistFormPage.tsx"
+        "frontend/src/components/layout/Header.tsx",
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -48,35 +44,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-on-form-submission-generate-a-simplified-pdf-representation-of-the-submitted-checklist-data-and-provide-an-immediate-pdf-download-to-the-user",
-      "featureTitle": "On form submission, generate a simplified PDF representation of the submitted checklist data and provide an immediate PDF download to the user.",
+      "featureId": "feature-fix-dropbox-upload-failures-by-ensuring-the-dropbox-token-is-retrieved-and-used-correctly-for-uploads-and-that-error-messages-shown-to-users-are-actionable-distinguish-missing-token-vs-dropbox-api-failure",
+      "featureTitle": "Fix Dropbox upload failures by ensuring the Dropbox token is retrieved and used correctly for uploads, and that error messages shown to users are actionable (distinguish missing token vs. Dropbox API failure).",
       "files": [
-        "frontend/src/lib/pdf/downloadPdf.ts",
-        "frontend/src/lib/pdf/generateChecklistPdf.ts",
+        "frontend/src/lib/upload/uploadChecklistPdf.ts",
         "frontend/src/pages/ChecklistFormPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "http-outcalls@3.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-an-admin-settings-page-where-an-admin-can-paste-and-save-a-dropbox-access-token-that-will-be-used-for-all-uploads-to-a-single-shared-dropbox-account",
-      "featureTitle": "Implement an admin settings page where an admin can paste and save a Dropbox access token that will be used for all uploads to a single shared Dropbox account.",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/auth/AccessDeniedScreen.tsx",
-        "frontend/src/components/auth/RequireAdmin.tsx",
-        "frontend/src/pages/AdminSettingsPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -93,11 +65,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-automatically-upload-the-generated-pdf-to-dropbox-upon-successful-form-submission-using-the-admin-provided-access-token-storing-the-file-in-the-shared-dropbox-account-with-the-filename-based-on-room-number",
-      "featureTitle": "Automatically upload the generated PDF to Dropbox upon successful form submission using the admin-provided access token, storing the file in the shared Dropbox account with the filename based on Room Number.",
+      "featureId": "feature-ensure-the-admin-settings-page-and-token-storage-work-end-to-end-admins-can-save-a-dropbox-access-token-to-the-backend-and-later-see-that-it-is-configured-while-non-admins-are-denied-access-with-the-existing-accessdeniedscreen-messaging",
+      "featureTitle": "Ensure the Admin Settings page and token storage work end-to-end: admins can save a Dropbox access token to the backend and later see that it is configured, while non-admins are denied access with the existing AccessDeniedScreen messaging.",
       "files": [
-        "frontend/src/lib/upload/uploadChecklistPdf.ts",
-        "frontend/src/pages/ChecklistFormPage.tsx"
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/AdminSettingsPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -110,29 +82,6 @@
       ],
       "testIds": [
         "REQ-5"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-a-coherent-distinct-visual-theme-for-the-app-and-apply-it-consistently-across-pages-and-components-without-using-a-blue-purple-primary-palette",
-      "featureTitle": "Create a coherent, distinct visual theme for the app and apply it consistently across pages and components (without using a blue/purple primary palette).",
-      "files": [
-        "frontend/src/index.css",
-        "frontend/src/pages/AdminSettingsPage.tsx",
-        "frontend/src/pages/ChecklistFormPage.tsx",
-        "frontend/tailwind.config.js"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "http-outcalls@3.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-7"
       ],
       "confidence": "high"
     }

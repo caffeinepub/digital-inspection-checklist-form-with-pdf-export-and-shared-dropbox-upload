@@ -34,7 +34,9 @@ export const UploadResult = IDL.Variant({
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'areAdminPrivilegesAvailable' : IDL.Func([], [IDL.Bool], ['query']),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'claimAdminPrivileges' : IDL.Func([], [], []),
   'getAllSortedByRoom' : IDL.Func([], [IDL.Vec(PdfEntry)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
@@ -80,7 +82,9 @@ export const idlFactory = ({ IDL }) => {
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'areAdminPrivilegesAvailable' : IDL.Func([], [IDL.Bool], ['query']),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'claimAdminPrivileges' : IDL.Func([], [], []),
     'getAllSortedByRoom' : IDL.Func([], [IDL.Vec(PdfEntry)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),

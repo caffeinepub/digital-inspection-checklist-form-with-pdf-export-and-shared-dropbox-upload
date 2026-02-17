@@ -10,7 +10,7 @@ import { useGetDropboxToken, useSetDropboxToken } from '../hooks/useQueries';
 import RequireAdmin from '../components/auth/RequireAdmin';
 
 function AdminSettingsContent() {
-  const { data: existingToken, isLoading: tokenLoading } = useGetDropboxToken();
+  const { data: existingToken, isLoading: tokenLoading, refetch } = useGetDropboxToken();
   const { mutate: setToken, isPending: isSaving } = useSetDropboxToken();
   const [tokenInput, setTokenInput] = useState('');
   const [showToken, setShowToken] = useState(false);
@@ -26,10 +26,11 @@ function AdminSettingsContent() {
 
     setSaveStatus('idle');
     setToken(tokenInput, {
-      onSuccess: () => {
+      onSuccess: async () => {
         setSaveStatus('success');
         setTokenInput('');
         setShowToken(false);
+        await refetch();
         toast.success('Dropbox token saved successfully');
       },
       onError: (error) => {

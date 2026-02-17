@@ -1,6 +1,5 @@
 import Map "mo:core/Map";
 import Blob "mo:core/Blob";
-import Iter "mo:core/Iter";
 import Order "mo:core/Order";
 import Text "mo:core/Text";
 import Array "mo:core/Array";
@@ -8,7 +7,9 @@ import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   // Data type definitions
   public type Room = Text;
@@ -45,6 +46,9 @@ actor {
   include MixinAuthorization(accessControlState);
 
   var dropboxToken : ?DropboxToken = null;
+
+  // Added admin claim tracking
+  var adminsClaimed : Bool = false;
 
   // User profile management
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
@@ -83,9 +87,9 @@ actor {
     dropboxToken;
   };
 
-  // PDF upload (backend-only)
+  // PDF upload
   public shared ({ caller }) func uploadPdf(_room : Room, _pdf : PdfBinary, _timestamp : Nat64) : async UploadResult {
-    Runtime.trap("Upload should be frontend only. Backend upload not implemented.");
+    Runtime.trap("Upload should be frontend only. Backend upload not implemented. ");
   };
 
   // Public query PDFs - require at least user access
@@ -108,5 +112,22 @@ actor {
       pdf = pdfData.pdf;
       metadata = pdfData.metadata;
     } }).sort(PdfEntry.compareByRoom);
+  };
+
+  // Admin privileges management
+  public shared ({ caller }) func claimAdminPrivileges() : async () {
+    // Require authenticated user before allowing admin claim
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can claim admin privileges");
+    };
+    if (adminsClaimed) {
+      Runtime.trap("Admin privileges have already been claimed.");
+    };
+    AccessControl.assignRole(accessControlState, caller, caller, #admin);
+    adminsClaimed := true;
+  };
+
+  public query ({ caller }) func areAdminPrivilegesAvailable() : async Bool {
+    not adminsClaimed;
   };
 };

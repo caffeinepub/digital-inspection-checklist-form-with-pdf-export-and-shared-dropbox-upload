@@ -65,6 +65,37 @@ export function useIsCallerAdmin() {
   });
 }
 
+export function useAreAdminPrivilegesAvailable() {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<boolean>({
+    queryKey: ['adminPrivilegesAvailable'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.areAdminPrivilegesAvailable();
+    },
+    enabled: !!actor && !actorFetching,
+    retry: false,
+  });
+}
+
+export function useClaimAdminPrivileges() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.claimAdminPrivileges();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['isAdmin'] });
+      queryClient.invalidateQueries({ queryKey: ['adminPrivilegesAvailable'] });
+      queryClient.invalidateQueries({ queryKey: ['currentUserRole'] });
+    },
+  });
+}
+
 export function useGetDropboxToken() {
   const { actor, isFetching: actorFetching } = useActor();
 

@@ -1,158 +1,131 @@
 {
   "kind": "build_request",
-  "title": "Digital inspection checklist form with PDF export and shared Dropbox upload",
-  "priority": "normal",
+  "title": "Fix admin access flow and Dropbox token/upload reliability",
+  "projectName": "Safety Inspection",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Create a two-page fillable digital form that recreates the uploaded “Courtesy Safety & Health Inspection Checklist” in the same section order as the photos, including all fields shown across both uploaded images.",
+      "text": "Diagnose and fix the live app failing to load across major browsers by eliminating any runtime errors during initial render (router mount, auth initialization, React Query actor creation) and ensuring the app consistently reaches the Checklist page or a clear error screen instead of a blank/sad-face page.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages"
+          "msg-1",
+          "msg-2"
         ],
         "quotes": [
-          "make a digital version of this document",
-          "Yes the app should recreate the checklist as a fillable digital form with the same layout.",
-          "Yes the uploaded images are a part of the same checklist. Include both in the digital form.",
-          "Yes they the form needs to be in the same order as the photo"
+          "App doesn't work,  find  out why and fix it.  How hard is that to understand?"
         ]
       },
       "acceptanceCriteria": [
-        "The UI contains the checklist title/header area with inputs for Inspector, Date, and Unit/Area (as shown in the images).",
-        "The UI includes checklist sections in the same order as the images (e.g., Entry & Initial Conditions; Lighting & Electrical; Bathroom Inspection; Water, Mold & Moisture Checks; Final Walk-Through & Exit; Notes/Issues Identified; Final Work Order Guidance).",
-        "Each checklist line item shown in the uploaded images is represented by an appropriate input (checkbox/radio/text/number) and is editable.",
-        "Bathroom Inspection items shown on page 2 include Yes/No style inputs where present in the images (e.g., Toilet Flush Test sub-items with Yes/No)."
+        "Opening the app in Chrome, Firefox, and Safari renders the main layout (Header + Checklist page) without a blank screen.",
+        "If authentication/actor initialization fails, the UI shows a readable error state instead of crashing.",
+        "No uncaught exceptions are logged during initial app load in the browser console."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Add a required “Room Number” selection/input that is used as the PDF filename for both download and Dropbox upload when a submission is completed.",
-      "target": "frontend",
+      "text": "Add an in-app admin access flow initiated by a button so an authenticated user can obtain admin privileges and then access the Admin Settings page to save a Dropbox token.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "recent-messages"
+          "msg-11",
+          "msg-12"
         ],
         "quotes": [
-          "I select the room number as the name of the pdf"
+          "No create a button that gives me admin access so i can add a drop box token",
+          "build it"
         ]
       },
       "acceptanceCriteria": [
-        "The user cannot submit the form without providing a Room Number.",
-        "On successful submission, the generated PDF filename uses the Room Number (e.g., \"<RoomNumber>.pdf\")."
+        "When a user is logged in but not an admin, the Header shows a clear call-to-action to obtain admin access.",
+        "Completing the admin access flow results in the user being recognized as admin (useIsCallerAdmin returns true) without requiring a manual refresh.",
+        "After admin access is granted, the Header shows the existing Admin button and the user can navigate to /admin successfully.",
+        "Non-authenticated users cannot obtain admin access and are prompted to log in first."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "On form submission, generate a simplified PDF representation of the submitted checklist data and provide an immediate PDF download to the user.",
-      "target": "frontend",
+      "text": "Implement backend support for the admin access flow by adding an explicit method to grant admin privileges in a controlled way (e.g., first-admin-claim when no admins exist, or another deterministic rule), and persist the resulting role assignment using the existing authorization system so it remains effective across sessions.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "recent-messages"
+          "msg-11"
         ],
         "quotes": [
-          "A simplified PDF version is acceptable.",
-          "make it so i can download a pdf"
+          "create a button that gives me admin access so i can add a drop box token"
         ]
       },
       "acceptanceCriteria": [
-        "Submitting a completed form generates a PDF that includes the Room Number, Inspector, Date, Unit/Area, and the checklist responses in readable text form (layout does not need to match the original precisely).",
-        "The user can download the generated PDF to their device after submission.",
-        "The generated PDF content reflects the current values entered into the digital form."
+        "A new backend method exists to perform the admin grant/claim and returns a success/failure outcome without trapping for expected failure cases.",
+        "The method only grants admin when the controlled rule is satisfied; otherwise it denies the request.",
+        "After a successful grant, isCallerAdmin returns true for that principal and remains true on subsequent calls."
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Implement an admin settings page where an admin can paste and save a Dropbox access token that will be used for all uploads to a single shared Dropbox account.",
-      "target": "both",
+      "text": "Fix Dropbox upload failures by ensuring the Dropbox token is retrieved and used correctly for uploads, and that error messages shown to users are actionable (distinguish missing token vs. Dropbox API failure).",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages"
+          "msg-5",
+          "msg-6"
         ],
         "quotes": [
-          "The submissions all go to the same dropbox account determined by admin",
-          "Yes, the admin should paste an access token into an admin settings page"
+          "why is it failing to upload to dropbox?",
+          "I am submitting it on the live app"
         ]
       },
       "acceptanceCriteria": [
-        "The app includes an Admin Settings screen with a field to paste a Dropbox access token and a Save action.",
-        "The token is persisted in the backend so it remains available after page reloads.",
-        "The UI displays a clear success/error state after saving the token.",
-        "The saved token is not exposed in the UI after saving (e.g., masked display or only \"token is set\" indicator)."
+        "If no Dropbox token is configured, submitting the checklist downloads the PDF and shows a clear message indicating Dropbox is not configured (no attempted upload).",
+        "If a token is configured, submitting the checklist attempts an upload to https://content.dropboxapi.com/2/files/upload and reports success/failure.",
+        "On Dropbox API failure, the UI displays a user-readable failure toast and logs the detailed error text for debugging.",
+        "No code path calls frontend/src/lib/upload/uploadChecklistPdf.ts in a way that throws 'must be called from component context'."
       ]
     },
     {
       "id": "REQ-5",
-      "text": "Automatically upload the generated PDF to Dropbox upon successful form submission using the admin-provided access token, storing the file in the shared Dropbox account with the filename based on Room Number.",
+      "text": "Ensure the Admin Settings page and token storage work end-to-end: admins can save a Dropbox access token to the backend and later see that it is configured, while non-admins are denied access with the existing AccessDeniedScreen messaging.",
       "target": "both",
       "source": {
         "messageIds": [
-          "recent-messages"
+          "msg-11"
         ],
         "quotes": [
-          "when a form is submitted... it automatically sends to the dropbox",
-          "The submissions all go to the same dropbox account determined by admin"
+          "add a drop box token"
         ]
       },
       "acceptanceCriteria": [
-        "If a Dropbox token is configured, submitting the form triggers an upload attempt to Dropbox for the generated PDF.",
-        "The upload uses the Room Number-based filename (\"<RoomNumber>.pdf\").",
-        "The UI shows upload status (uploading/success/failure) and does not claim success if the Dropbox API call fails.",
-        "If the Dropbox token is missing, the app still allows PDF download and shows a clear message that Dropbox upload is not configured."
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Add basic admin protection for the Dropbox token settings so only an admin identity can set/replace the token.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "recent-messages"
-        ],
-        "quotes": [
-          "admin settings page",
-          "dropbox account determined by admin"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend rejects token update attempts from non-admin callers with a clear error.",
-        "Backend provides a way to determine who the admin is (e.g., initial admin is the canister installer) and uses that for authorization checks.",
-        "Frontend shows an access-denied state if a non-admin navigates to Admin Settings."
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "text": "Create a coherent, distinct visual theme for the app and apply it consistently across pages and components (without using a blue/purple primary palette).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "recent-messages"
-        ],
-        "quotes": [
-          "build the app"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The app has a consistent typography, spacing, and component styling suitable for a checklist/inspection workflow.",
-        "Primary color styling is not blue/purple.",
-        "Form sections are visually separated and easy to scan (e.g., section headers, dividers, grouping)."
+        "As an admin, saving a token on /admin calls the backend and persists the token (subsequent loads show 'Dropbox token is configured').",
+        "As a non-admin, navigating to /admin shows the access denied UI (no token data is revealed).",
+        "The token is never displayed in plaintext by default in the UI (password-masked input remains the default behavior)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor (all backend logic in backend/main.mo).",
-    "Do not edit files under frontend/src/components/ui or other immutablePaths listed in SYSTEM_CONTEXT; compose them instead.",
-    "Use English for all user-facing text.",
-    "Dropbox authentication must be implemented via an admin-pasted access token (no per-user Dropbox OAuth)."
+    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
+    "Do not edit any files under frontend/src/components/ui or any paths listed as immutable in SYSTEM_CONTEXT.",
+    "Use English for all user-facing UI text and error messages.",
+    "Do not introduce third-party authentication; only Internet Identity is supported.",
+    "Do not add external databases or off-platform token storage; store the Dropbox token only in the existing backend canister state."
   ],
   "nonGoals": [
-    "Exact pixel-perfect PDF layout matching the original document.",
-    "Storing or browsing historical submissions (unless required for the Dropbox upload flow).",
-    "Per-user Dropbox accounts or third-party auth beyond Internet Identity.",
-    "Real-time collaboration or chat."
+    "Implementing server-side (backend) Dropbox uploads (uploads remain frontend-to-Dropbox).",
+    "Adding real-time features (WebSockets), push notifications, or email/SMS integrations.",
+    "Adding support for non-Dropbox storage providers."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

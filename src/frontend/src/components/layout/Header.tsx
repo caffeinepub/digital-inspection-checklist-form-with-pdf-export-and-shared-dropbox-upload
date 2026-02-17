@@ -1,15 +1,18 @@
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
-import { Settings, ClipboardList } from 'lucide-react';
+import { Settings, ClipboardList, ShieldCheck, Loader2 } from 'lucide-react';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
-import { useIsCallerAdmin } from '../../hooks/useQueries';
+import { useIsCallerAdmin, useAreAdminPrivilegesAvailable, useClaimAdminPrivileges } from '../../hooks/useQueries';
+import { toast } from 'sonner';
 
 export default function Header() {
   const navigate = useNavigate();
   const { login, clear, loginStatus, identity } = useInternetIdentity();
   const queryClient = useQueryClient();
-  const { data: isAdmin } = useIsCallerAdmin();
+  const { data: isAdmin, isLoading: adminLoading } = useIsCallerAdmin();
+  const { data: adminAvailable, isLoading: availableLoading } = useAreAdminPrivilegesAvailable();
+  const { mutate: claimAdmin, isPending: claiming } = useClaimAdminPrivileges();
 
   const isAuthenticated = !!identity;
   const disabled = loginStatus === 'logging-in';
@@ -33,6 +36,25 @@ export default function Header() {
     }
   };
 
+  const handleClaimAdmin = () => {
+    if (!isAuthenticated) {
+      toast.error('Please log in first');
+      return;
+    }
+
+    claimAdmin(undefined, {
+      onSuccess: () => {
+        toast.success('Admin access granted successfully');
+      },
+      onError: (error: any) => {
+        console.error('Claim admin error:', error);
+        toast.error(error?.message || 'Failed to claim admin access');
+      },
+    });
+  };
+
+  const showClaimButton = isAuthenticated && !isAdmin && adminAvailable && !adminLoading && !availableLoading;
+
   return (
     <header className="border-b bg-card shadow-sm">
       <div className="container mx-auto px-4 py-4">
@@ -48,6 +70,27 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-3">
+            {showClaimButton && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleClaimAdmin}
+                disabled={claiming}
+              >
+                {claiming ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Claiming...
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="h-4 w-4 mr-2" />
+                    Get Admin Access
+                  </>
+                )}
+              </Button>
+            )}
+
             {isAuthenticated && isAdmin && (
               <Button
                 variant="outline"

@@ -121,7 +121,9 @@ export enum UserRole {
 }
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
+    areAdminPrivilegesAvailable(): Promise<boolean>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    claimAdminPrivileges(): Promise<void>;
     getAllSortedByRoom(): Promise<Array<PdfEntry>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
@@ -150,6 +152,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async areAdminPrivilegesAvailable(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.areAdminPrivilegesAvailable();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.areAdminPrivilegesAvailable();
+            return result;
+        }
+    }
     async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
         if (this.processError) {
             try {
@@ -161,6 +177,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n1(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async claimAdminPrivileges(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.claimAdminPrivileges();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.claimAdminPrivileges();
             return result;
         }
     }

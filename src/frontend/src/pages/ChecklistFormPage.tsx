@@ -14,6 +14,7 @@ import { useDropboxConfiguration, useGetDropboxToken } from '../hooks/useQueries
 import { generateChecklistPdf } from '../lib/pdf/generateChecklistPdf';
 import { downloadPdf } from '../lib/pdf/downloadPdf';
 import { sanitizeFilename } from '../lib/pdf/filename';
+import { uploadChecklistPdf } from '../lib/upload/uploadChecklistPdf';
 import type { ChecklistFormData } from '../lib/checklist/types';
 import { getDefaultChecklistData } from '../lib/checklist/defaults';
 
@@ -26,31 +27,6 @@ export default function ChecklistFormPage() {
 
   const updateField = <K extends keyof ChecklistFormData>(field: K, value: ChecklistFormData[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const uploadToDropbox = async (pdfBytes: Uint8Array, roomNumber: string, token: string) => {
-    // Create a new Uint8Array to ensure proper typing for fetch body
-    const bytes = new Uint8Array(pdfBytes);
-    
-    const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/octet-stream',
-        'Dropbox-API-Arg': JSON.stringify({
-          path: `/${roomNumber}.pdf`,
-          mode: 'overwrite',
-          autorename: false,
-          mute: false,
-        }),
-      },
-      body: bytes,
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Dropbox upload failed: ${errorText}`);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,14 +52,15 @@ export default function ChecklistFormPage() {
       // Upload to Dropbox if configured
       if (dropboxConfigured && dropboxToken) {
         setUploadStatus('uploading');
-        try {
-          await uploadToDropbox(pdfBytes, formData.roomNumber, dropboxToken);
+        const result = await uploadChecklistPdf(formData.roomNumber, pdfBytes, dropboxToken);
+        
+        if (result.success) {
           setUploadStatus('success');
           toast.success('PDF uploaded to Dropbox successfully');
-        } catch (uploadError) {
+        } else {
           setUploadStatus('error');
           toast.error('Failed to upload to Dropbox');
-          console.error('Dropbox upload error:', uploadError);
+          console.error('Dropbox upload error:', result.error);
         }
       } else {
         toast.info('Dropbox not configured. PDF downloaded only.');
@@ -242,20 +219,23 @@ export default function ChecklistFormPage() {
                     id="scaleBuildup"
                     checked={formData.section1.scaleBuildup}
                     onCheckedChange={(checked) =>
-                      updateField('section1', { ...formData.section1, scaleBuildup: !!checked })
+                      updateField('section1', {
+                        ...formData.section1,
+                        scaleBuildup: !!checked
+                      })
                     }
                   />
                   <Label htmlFor="scaleBuildup" className="font-medium">
-                    Scale Buildup in shower wand – If significant scale is present, allow fixture to sit in descaler solution while completing the remainder of the inspection
+                    Scale Buildup – Check for mineral deposits or scale buildup
                   </Label>
                 </div>
               </div>
             </ChecklistSection>
 
-            {/* Section 2: Lighting & Electrical */}
+            {/* Section 2: Electrical Inspection */}
             <ChecklistSection
-              title="2. Lighting & Electrical (3 Minutes)"
-              description="Test all electrical components and lighting"
+              title="2. Electrical Inspection (5 Minutes)"
+              description="Check electrical fixtures and safety"
             >
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
@@ -267,7 +247,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="lightSwitches" className="font-medium">
-                    Light Switches – Test all switches for proper operation
+                    Light switches work properly
                   </Label>
                 </div>
 
@@ -284,11 +264,11 @@ export default function ChecklistFormPage() {
                       }
                     />
                     <Label htmlFor="bulbs" className="font-medium">
-                      Bulbs – Check for dim, flickering, or burned-out bulbs
+                      All bulbs functional
                     </Label>
                   </div>
                   <Input
-                    placeholder="Notes / Locations"
+                    placeholder="Notes on bulbs"
                     value={formData.section2.bulbs.notes}
                     onChange={(e) =>
                       updateField('section2', {
@@ -309,7 +289,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="outletSwitchCovers" className="font-medium">
-                    Outlet & Switch Covers – Secure and undamaged
+                    Outlet and switch covers in place
                   </Label>
                 </div>
 
@@ -322,7 +302,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="gfciOutlets" className="font-medium">
-                    GFCI Outlets – Press TEST (should click and cut power), then RESET
+                    GFCI outlets in wet areas
                   </Label>
                 </div>
 
@@ -335,16 +315,16 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="noBurnMarks" className="font-medium">
-                    No Burn Marks, Heat, or Odors at outlets or switches
+                    No burn marks on outlets or switches
                   </Label>
                 </div>
               </div>
             </ChecklistSection>
 
-            {/* Section 3: Bathroom Inspection */}
+            {/* Section 3: Plumbing & Bathroom */}
             <ChecklistSection
-              title="3. Bathroom Inspection (8–9 Minutes)"
-              description="Comprehensive bathroom fixture and plumbing checks"
+              title="3. Plumbing & Bathroom (5 Minutes)"
+              description="Check plumbing fixtures and bathroom conditions"
             >
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -360,11 +340,11 @@ export default function ChecklistFormPage() {
                       }
                     />
                     <Label htmlFor="hotWaterFixtures" className="font-medium">
-                      Hot Water Through Fixtures – Run hot water at sinks and showers
+                      Hot water available at fixtures
                     </Label>
                   </div>
                   <Input
-                    placeholder="Water Temp (°F)"
+                    placeholder="Water temperature (°F)"
                     value={formData.section3.hotWaterFixtures.waterTemp}
                     onChange={(e) =>
                       updateField('section3', {
@@ -385,7 +365,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="drainage" className="font-medium">
-                    Drainage – Test sink, tub, and shower for proper drainage
+                    Drainage working properly
                   </Label>
                 </div>
 
@@ -398,7 +378,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="popUpAssembly" className="font-medium">
-                    Pop-Up Assembly – Verify opens, closes, and seals properly
+                    Pop-up assembly functional
                   </Label>
                 </div>
 
@@ -411,45 +391,44 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="soapDispenser" className="font-medium">
-                    Soap Dispenser – Test for proper operation
+                    Soap dispenser working
                   </Label>
                 </div>
 
-                <div className="space-y-3 pl-4 border-l-4 border-emerald-500">
-                  <Label className="font-bold text-base">Toilet Flush Test</Label>
-                  
-                  <YesNoField
-                    label="Flush and verify proper operation"
-                    value={formData.section3.toiletFlushTest.flushOperation}
-                    onChange={(value) =>
-                      updateField('section3', {
-                        ...formData.section3,
-                        toiletFlushTest: { ...formData.section3.toiletFlushTest, flushOperation: value }
-                      })
-                    }
-                  />
-
-                  <YesNoField
-                    label="Toilet secure at base"
-                    value={formData.section3.toiletFlushTest.secureAtBase}
-                    onChange={(value) =>
-                      updateField('section3', {
-                        ...formData.section3,
-                        toiletFlushTest: { ...formData.section3.toiletFlushTest, secureAtBase: value }
-                      })
-                    }
-                  />
-
-                  <YesNoField
-                    label="Observe rear caulk opening for leakage"
-                    value={formData.section3.toiletFlushTest.rearCaulkLeakage}
-                    onChange={(value) =>
-                      updateField('section3', {
-                        ...formData.section3,
-                        toiletFlushTest: { ...formData.section3.toiletFlushTest, rearCaulkLeakage: value }
-                      })
-                    }
-                  />
+                <div className="space-y-2">
+                  <Label className="font-medium">Toilet Flush Test</Label>
+                  <div className="ml-6 space-y-3">
+                    <YesNoField
+                      label="Flush operation normal"
+                      value={formData.section3.toiletFlushTest.flushOperation}
+                      onChange={(value) =>
+                        updateField('section3', {
+                          ...formData.section3,
+                          toiletFlushTest: { ...formData.section3.toiletFlushTest, flushOperation: value }
+                        })
+                      }
+                    />
+                    <YesNoField
+                      label="Secure at base"
+                      value={formData.section3.toiletFlushTest.secureAtBase}
+                      onChange={(value) =>
+                        updateField('section3', {
+                          ...formData.section3,
+                          toiletFlushTest: { ...formData.section3.toiletFlushTest, secureAtBase: value }
+                        })
+                      }
+                    />
+                    <YesNoField
+                      label="Rear caulk leakage"
+                      value={formData.section3.toiletFlushTest.rearCaulkLeakage}
+                      onChange={(value) =>
+                        updateField('section3', {
+                          ...formData.section3,
+                          toiletFlushTest: { ...formData.section3.toiletFlushTest, rearCaulkLeakage: value }
+                        })
+                      }
+                    />
+                  </div>
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -461,7 +440,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="rearCaulkOpening" className="font-medium">
-                    Rear Caulk Opening – If no opening exists, create one by cutting out a 2-inch section at the back edge of the toilet base to allow leak detection
+                    Rear caulk opening present
                   </Label>
                 </div>
 
@@ -474,16 +453,16 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="bathroomGFCI" className="font-medium">
-                    Bathroom GFCI Protection – Confirm outlets are GFCI-protected and functional
+                    Bathroom GFCI functional
                   </Label>
                 </div>
               </div>
             </ChecklistSection>
 
-            {/* Section 4: Water, Mold & Moisture Checks */}
+            {/* Section 4: Moisture & Structural */}
             <ChecklistSection
-              title="4. Water, Mold & Moisture Checks (5 Minutes)"
-              description="Inspect for water damage, leaks, and moisture issues"
+              title="4. Moisture & Structural Inspection (5 Minutes)"
+              description="Check for moisture issues and structural integrity"
             >
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
@@ -495,7 +474,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="underSinksDry" className="font-medium">
-                    Under sinks dry; no leaks or staining
+                    Under sinks dry and clean
                   </Label>
                 </div>
 
@@ -521,7 +500,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="ceilingsWallsClean" className="font-medium">
-                    Ceilings and walls free of stains, bubbling, or peeling paint
+                    Ceilings and walls clean, no stains
                   </Label>
                 </div>
 
@@ -547,7 +526,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="behindRefrigeratorDry" className="font-medium">
-                    Behind refrigerator dry; no visible leaks or mold
+                    Behind refrigerator dry
                   </Label>
                 </div>
 
@@ -560,7 +539,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="waterHeaterAreaDry" className="font-medium">
-                    Water heater area dry with no visible leaks
+                    Water heater area dry
                   </Label>
                 </div>
 
@@ -573,16 +552,16 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="mainShutOffValve" className="font-medium">
-                    Main Shut-Off Valve – Exercised and operational
+                    Main shut-off valve accessible
                   </Label>
                 </div>
               </div>
             </ChecklistSection>
 
-            {/* Section 5: Final Walk-Through & Exit */}
+            {/* Section 5: Final Checks */}
             <ChecklistSection
-              title="5. Final Walk-Through & Exit (1 Minute)"
-              description="Final checks before leaving the unit"
+              title="5. Final Checks (3 Minutes)"
+              description="Final inspection before leaving"
             >
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
@@ -594,7 +573,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="allFixturesOff" className="font-medium">
-                    All fixtures turned OFF
+                    All fixtures turned off
                   </Label>
                 </div>
 
@@ -626,26 +605,26 @@ export default function ChecklistFormPage() {
               </div>
             </ChecklistSection>
 
-            {/* Notes / Issues Identified */}
-            <ChecklistSection
-              title="Notes / Issues Identified"
-              description="Document any issues or observations"
-            >
+            <Separator className="my-6" />
+
+            {/* Notes and Issues */}
+            <div className="space-y-2">
+              <Label htmlFor="notesIssues" className="text-base font-semibold">
+                Notes & Issues
+              </Label>
               <Textarea
+                id="notesIssues"
+                placeholder="Document any issues, concerns, or additional observations"
                 value={formData.notesIssues}
                 onChange={(e) => updateField('notesIssues', e.target.value)}
-                placeholder="Enter any notes or issues identified during inspection..."
-                rows={4}
-                className="w-full"
+                rows={5}
               />
-            </ChecklistSection>
+            </div>
 
-            {/* Final Work Order Guidance */}
-            <ChecklistSection
-              title="Final Work Order Guidance"
-              description="Work order creation guidelines"
-            >
-              <div className="space-y-4">
+            {/* Work Order Guidance */}
+            <div className="space-y-4 p-4 bg-muted rounded-lg">
+              <Label className="text-base font-semibold">Work Order Guidance</Label>
+              <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="createWorkOrder"
@@ -658,7 +637,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="createWorkOrder" className="font-medium">
-                    Create a Work Order (W/O) for any item requiring repair, replacement, further investigation, or that poses a safety or health concern
+                    Create work order for issues found
                   </Label>
                 </div>
 
@@ -674,21 +653,56 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="doNotCreateWO" className="font-medium">
-                    Do NOT create a W/O for minor adjustments only (tightening, resetting, simple cleaning) unless the issue is recurring or cannot be fully resolved during the inspection
+                    Do not create work order
                   </Label>
                 </div>
               </div>
-            </ChecklistSection>
+            </div>
 
             <Separator className="my-6" />
 
-            {/* Submit Button and Status */}
+            {/* Submit Section */}
             <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                <div className="flex items-center gap-2">
+                  {uploadStatus === 'uploading' && (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                      <span className="text-sm font-medium">Uploading to Dropbox...</span>
+                    </>
+                  )}
+                  {uploadStatus === 'success' && (
+                    <>
+                      <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                      <span className="text-sm font-medium text-emerald-600">Uploaded successfully</span>
+                    </>
+                  )}
+                  {uploadStatus === 'error' && (
+                    <>
+                      <AlertCircle className="h-5 w-5 text-destructive" />
+                      <span className="text-sm font-medium text-destructive">Upload failed</span>
+                    </>
+                  )}
+                  {uploadStatus === 'idle' && dropboxConfigured && (
+                    <>
+                      <Upload className="h-5 w-5 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Will upload to Dropbox</span>
+                    </>
+                  )}
+                  {uploadStatus === 'idle' && !dropboxConfigured && (
+                    <>
+                      <AlertCircle className="h-5 w-5 text-amber-600" />
+                      <span className="text-sm text-muted-foreground">Dropbox not configured</span>
+                    </>
+                  )}
+                </div>
+              </div>
+
               <Button
                 type="submit"
                 size="lg"
+                className="w-full"
                 disabled={isSubmitting}
-                className="w-full text-lg font-semibold"
               >
                 {isSubmitting ? (
                   <>
@@ -698,38 +712,10 @@ export default function ChecklistFormPage() {
                 ) : (
                   <>
                     <Download className="mr-2 h-5 w-5" />
-                    Submit & Download PDF
+                    Generate & Download PDF
                   </>
                 )}
               </Button>
-
-              {uploadStatus === 'uploading' && (
-                <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Uploading to Dropbox...</span>
-                </div>
-              )}
-
-              {uploadStatus === 'success' && (
-                <div className="flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400">
-                  <CheckCircle2 className="h-5 w-5" />
-                  <span>Successfully uploaded to Dropbox</span>
-                </div>
-              )}
-
-              {uploadStatus === 'error' && (
-                <div className="flex items-center justify-center gap-2 text-destructive">
-                  <AlertCircle className="h-5 w-5" />
-                  <span>Failed to upload to Dropbox</span>
-                </div>
-              )}
-
-              {!dropboxConfigured && (
-                <div className="text-center text-sm text-muted-foreground">
-                  <Upload className="inline h-4 w-4 mr-1" />
-                  Dropbox upload not configured. PDF will be downloaded only.
-                </div>
-              )}
             </div>
           </form>
         </CardContent>

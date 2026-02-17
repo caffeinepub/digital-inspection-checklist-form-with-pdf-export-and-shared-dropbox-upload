@@ -1,59 +1,45 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Build a web app that recreates a two-page checklist document as a fillable digital form (same section order/layout), generates a simplified PDF on submission, allows PDF download, and automatically uploads the PDF to a shared Dropbox account using an admin-provided access token with the filename based on selected room number.",
+  "summary": "Rebuild the existing (old) app so it loads reliably and address Dropbox upload issues, including adding an in-app admin access button to set/store a Dropbox token.",
   "architectural_notes": [
-    "Dropbox uploads use a single shared Dropbox account configured by an admin via an access token stored in app settings.",
-    "On form submission: generate a simplified PDF, name it using the selected room number, upload to Dropbox, and provide a download option."
+    "App requires Dropbox integration; token must be configurable via an admin-only UI/flow (secure storage/handling needed)."
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "Live app fails to load across major browsers (Chrome/Firefox/Safari).",
+    "Dropbox upload is failing in the live app."
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-create-a-two-page-fillable-digital-form-that-recreates-the-uploaded-courtesy-safety-health-inspection-checklist-in-the-same-section-order-as-the-photos-including-all-fields-shown-across-both-uploaded-images",
-      "title": "Create a two-page fillable digital form that recreates the uploaded “Courtesy Safety & Health Inspection Checklist” in the same section order as the photos, including all fields shown across both uploaded images.",
+      "id": "feature-diagnose-and-fix-the-live-app-failing-to-load-across-major-browsers-by-eliminating-any-runtime-errors-during-initial-render-router-mount-auth-initialization-react-query-actor-creation-and-ensuring-the-app-consistently-reaches-the-checklist-page-or-a-clear-error-screen-instead-of-a-blank-sad-face-page",
+      "title": "Diagnose and fix the live app failing to load across major browsers by eliminating any runtime errors during initial render (router mount, auth initialization, React Query actor creation) and ensuring the app consistently reaches the Checklist page or a clear error screen instead of a blank/sad-face page.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-a-required-room-number-selection-input-that-is-used-as-the-pdf-filename-for-both-download-and-dropbox-upload-when-a-submission-is-completed",
-      "title": "Add a required “Room Number” selection/input that is used as the PDF filename for both download and Dropbox upload when a submission is completed.",
+      "id": "feature-add-an-in-app-admin-access-flow-initiated-by-a-button-so-an-authenticated-user-can-obtain-admin-privileges-and-then-access-the-admin-settings-page-to-save-a-dropbox-token",
+      "title": "Add an in-app admin access flow initiated by a button so an authenticated user can obtain admin privileges and then access the Admin Settings page to save a Dropbox token.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-on-form-submission-generate-a-simplified-pdf-representation-of-the-submitted-checklist-data-and-provide-an-immediate-pdf-download-to-the-user",
-      "title": "On form submission, generate a simplified PDF representation of the submitted checklist data and provide an immediate PDF download to the user.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-an-admin-settings-page-where-an-admin-can-paste-and-save-a-dropbox-access-token-that-will-be-used-for-all-uploads-to-a-single-shared-dropbox-account",
-      "title": "Implement an admin settings page where an admin can paste and save a Dropbox access token that will be used for all uploads to a single shared Dropbox account.",
+      "id": "feature-fix-dropbox-upload-failures-by-ensuring-the-dropbox-token-is-retrieved-and-used-correctly-for-uploads-and-that-error-messages-shown-to-users-are-actionable-distinguish-missing-token-vs-dropbox-api-failure",
+      "title": "Fix Dropbox upload failures by ensuring the Dropbox token is retrieved and used correctly for uploads, and that error messages shown to users are actionable (distinguish missing token vs. Dropbox API failure).",
       "reqIds": [
         "REQ-4"
       ],
       "version": 1
     },
     {
-      "id": "feature-automatically-upload-the-generated-pdf-to-dropbox-upon-successful-form-submission-using-the-admin-provided-access-token-storing-the-file-in-the-shared-dropbox-account-with-the-filename-based-on-room-number",
-      "title": "Automatically upload the generated PDF to Dropbox upon successful form submission using the admin-provided access token, storing the file in the shared Dropbox account with the filename based on Room Number.",
+      "id": "feature-ensure-the-admin-settings-page-and-token-storage-work-end-to-end-admins-can-save-a-dropbox-access-token-to-the-backend-and-later-see-that-it-is-configured-while-non-admins-are-denied-access-with-the-existing-accessdeniedscreen-messaging",
+      "title": "Ensure the Admin Settings page and token storage work end-to-end: admins can save a Dropbox access token to the backend and later see that it is configured, while non-admins are denied access with the existing AccessDeniedScreen messaging.",
       "reqIds": [
         "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-a-coherent-distinct-visual-theme-for-the-app-and-apply-it-consistently-across-pages-and-components-without-using-a-blue-purple-primary-palette",
-      "title": "Create a coherent, distinct visual theme for the app and apply it consistently across pages and components (without using a blue/purple primary palette).",
-      "reqIds": [
-        "REQ-7"
       ],
       "version": 1
     }
@@ -61,33 +47,20 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Recreate the checklist as a fillable digital form including both uploaded pages, preserving the same section/order layout",
+      "summary": "Add an in-app admin access button/flow that allows entering and saving a Dropbox token for Dropbox uploads.",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-2",
-      "summary": "Generate a simplified PDF from a submitted form and allow the user to download the PDF",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Dropbox integration: admin settings page to paste a Dropbox access token (single shared account) and auto-upload submitted PDFs named by selected room number",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-9",
-      "summary": "Add basic admin protection for the Dropbox token settings so only an admin identity can set/replace the token.",
+      "id": "AR-4",
+      "summary": "Implement backend support for the admin access flow by adding an explicit method to grant admin privileges in a controlled way (e.g., first-admin-claim when no admins exist, or another deterministic rule), and persist the resulting role assignment using the existing authorization system so it remains effective across sessions.",
       "reqIds": [
-        "REQ-6"
+        "REQ-3"
       ],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
-  "projectName": "Digital inspection checklist form with PDF export and shared Dropbox upload",
+  "projectName": "Safety Inspection",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
