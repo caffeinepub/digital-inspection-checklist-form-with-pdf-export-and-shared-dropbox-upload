@@ -1,38 +1,33 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T20:35:54.099Z",
-  "summary": "Most frontend requirements appear implemented: app initialization now shows loading/error screens instead of blank render; Header includes a \"Get Admin Access\" CTA for authenticated non-admin users; Admin Settings page can save a masked Dropbox token; checklist submission downloads PDF and conditionally uploads to Dropbox using a pure utility upload function with logging. Backend token getters/setters exist and state migration was added, but the diff is truncated around the new backend admin-claim methods, so controlled-rule enforcement and non-trapping success/failure outcomes for REQ-3 cannot be fully verified from the provided evidence.",
+  "generatedAt": "2026-02-17T22:17:56.923Z",
+  "summary": "Data model (types/defaults) and PDF output were updated to include both new checklist items. The diff summary does not provide direct evidence that the form UI (ChecklistFormPage.tsx) renders and wires up the new fields with the exact required labels, due to truncation and lack of the relevant JSX in the provided excerpt.",
   "missing_requirements": [
     {
-      "id": "REQ-3",
-      "requirement": "Backend support for admin access flow: an explicit method to grant/claim admin with a controlled rule, returning success/failure without trapping for expected failures, and persisting admin role assignment so isCallerAdmin remains true across sessions.",
-      "reason": "backend/main.mo is truncated exactly where the new admin privileges management methods would be implemented (claimAdminPrivileges and likely areAdminPrivilegesAvailable). The diff summary does not show the method body/return type or the controlled rule/denial path, so it cannot be confirmed that it returns a success/failure outcome (instead of trapping) and enforces the intended controlled rule while persisting the assignment.",
+      "id": "REQ-1",
+      "requirement": "Checklist form UI (frontend/src/pages/ChecklistFormPage.tsx) renders a checkbox labeled exactly \"Main Shut Off Valve Exercised\" and updates form state when toggled.",
+      "reason": "The provided diff excerpt for ChecklistFormPage.tsx is truncated before the relevant section, and no JSX/handler code for the new checkbox is visible in the evidence.",
       "evidence": [
-        "backend/main.mo (truncated at `public shared ({ caller }) func claimAdminPrivileges()`)"
+        "frontend/src/pages/ChecklistFormPage.tsx (truncated)"
       ]
-    }
-  ],
-  "hallucinated_features": [
+    },
     {
-      "description": "Added `pdf-lib` dependency in the frontend package configuration.",
-      "reason": "The BuildRequest did not request adding any new PDF library dependency; it only required reliability fixes, admin flow, and Dropbox upload/token handling.",
+      "id": "REQ-2",
+      "requirement": "Checklist form UI (frontend/src/pages/ChecklistFormPage.tsx) renders a YesNoField in the toilet area labeled exactly \"Toilet tank is free of cracks/leaks\" and updates form state.",
+      "reason": "The provided diff excerpt for ChecklistFormPage.tsx is truncated before the toilet section UI, and no YesNoField usage for the new item is visible in the evidence.",
       "evidence": [
-        "frontend-file-summaries.txt (\"frontend/package.json\": \"... pdf-lib dependency added ...\")"
+        "frontend/src/pages/ChecklistFormPage.tsx (truncated)"
       ]
     }
   ],
-  "confidence": 0.62,
+  "hallucinated_features": [],
+  "confidence": 0.64,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
-    "frontend/src/components/layout/Header.tsx",
-    "frontend/src/components/system/InitErrorScreen.tsx",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/lib/upload/uploadChecklistPdf.ts",
-    "frontend/src/pages/AdminSettingsPage.tsx",
+    "frontend/src/lib/checklist/defaults.ts",
+    "frontend/src/lib/checklist/types.ts",
+    "frontend/src/lib/pdf/generateChecklistPdf.ts",
     "frontend/src/pages/ChecklistFormPage.tsx",
     "project_state.json"
   ]

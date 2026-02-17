@@ -1,45 +1,26 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Rebuild the existing (old) app so it loads reliably and address Dropbox upload issues, including adding an in-app admin access button to set/store a Dropbox token.",
-  "architectural_notes": [
-    "App requires Dropbox integration; token must be configurable via an admin-only UI/flow (secure storage/handling needed)."
-  ],
+  "summary": "New project",
+  "architectural_notes": [],
   "known_issues": [
-    "Live app fails to load across major browsers (Chrome/Firefox/Safari).",
-    "Dropbox upload is failing in the live app."
+    "iOS Safari upload can fail on phone with WebKitBlobResource error 1 (file blob read/revoked issue), even when Dropbox upload works on desktop."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-diagnose-and-fix-the-live-app-failing-to-load-across-major-browsers-by-eliminating-any-runtime-errors-during-initial-render-router-mount-auth-initialization-react-query-actor-creation-and-ensuring-the-app-consistently-reaches-the-checklist-page-or-a-clear-error-screen-instead-of-a-blank-sad-face-page",
-      "title": "Diagnose and fix the live app failing to load across major browsers by eliminating any runtime errors during initial render (router mount, auth initialization, React Query actor creation) and ensuring the app consistently reaches the Checklist page or a clear error screen instead of a blank/sad-face page.",
+      "id": "feature-add-a-new-checklist-field-labeled-main-shut-off-valve-exercised-to-the-form-store-it-in-the-checklist-data-model-and-include-it-in-the-generated-pdf-output",
+      "title": "Add a new checklist field labeled \"Main Shut Off Valve Exercised\" to the form, store it in the checklist data model, and include it in the generated PDF output.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-an-in-app-admin-access-flow-initiated-by-a-button-so-an-authenticated-user-can-obtain-admin-privileges-and-then-access-the-admin-settings-page-to-save-a-dropbox-token",
-      "title": "Add an in-app admin access flow initiated by a button so an authenticated user can obtain admin privileges and then access the Admin Settings page to save a Dropbox token.",
+      "id": "feature-in-the-toilet-section-of-the-checklist-form-add-a-new-item-labeled-toilet-tank-is-free-of-cracks-leaks-store-it-in-the-checklist-data-model-and-include-it-in-the-generated-pdf-output",
+      "title": "In the Toilet section of the checklist form, add a new item labeled \"Toilet tank is free of cracks/leaks\", store it in the checklist data model, and include it in the generated PDF output.",
       "reqIds": [
         "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-fix-dropbox-upload-failures-by-ensuring-the-dropbox-token-is-retrieved-and-used-correctly-for-uploads-and-that-error-messages-shown-to-users-are-actionable-distinguish-missing-token-vs-dropbox-api-failure",
-      "title": "Fix Dropbox upload failures by ensuring the Dropbox token is retrieved and used correctly for uploads, and that error messages shown to users are actionable (distinguish missing token vs. Dropbox API failure).",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-the-admin-settings-page-and-token-storage-work-end-to-end-admins-can-save-a-dropbox-access-token-to-the-backend-and-later-see-that-it-is-configured-while-non-admins-are-denied-access-with-the-existing-accessdeniedscreen-messaging",
-      "title": "Ensure the Admin Settings page and token storage work end-to-end: admins can save a Dropbox access token to the backend and later see that it is configured, while non-admins are denied access with the existing AccessDeniedScreen messaging.",
-      "reqIds": [
-        "REQ-5"
       ],
       "version": 1
     }
@@ -47,16 +28,14 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add an in-app admin access button/flow that allows entering and saving a Dropbox token for Dropbox uploads.",
+      "summary": "Update form to add field 'Main Shut Off Valve Exercised'",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-4",
-      "summary": "Implement backend support for the admin access flow by adding an explicit method to grant admin privileges in a controlled way (e.g., first-admin-claim when no admins exist, or another deterministic rule), and persist the resulting role assignment using the existing authorization system so it remains effective across sessions.",
-      "reqIds": [
-        "REQ-3"
-      ],
+      "id": "AR-2",
+      "summary": "Update Toilet section to add field 'Toilet tank is free of cracks/leaks'",
+      "reqIds": [],
       "status": "pending"
     }
   ],

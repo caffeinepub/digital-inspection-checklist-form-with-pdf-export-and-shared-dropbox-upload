@@ -41,6 +41,7 @@ export interface ChecklistFormData {
       secureAtBase: 'yes' | 'no' | '';
       rearCaulkLeakage: 'yes' | 'no' | '';
     };
+    toiletTankFreeOfCracks: 'yes' | 'no' | '';
     rearCaulkOpening: boolean;
     bathroomGFCI: boolean;
   };
@@ -53,6 +54,7 @@ export interface ChecklistFormData {
     behindRefrigeratorDry: boolean;
     waterHeaterAreaDry: boolean;
     mainShutOffValve: boolean;
+    mainShutOffValveExercised: boolean;
   };
   
   section5: {

@@ -428,6 +428,16 @@ export default function ChecklistFormPage() {
                         })
                       }
                     />
+                    <YesNoField
+                      label="Toilet tank is free of cracks/leaks"
+                      value={formData.section3.toiletTankFreeOfCracks}
+                      onChange={(value) =>
+                        updateField('section3', {
+                          ...formData.section3,
+                          toiletTankFreeOfCracks: value
+                        })
+                      }
+                    />
                   </div>
                 </div>
 
@@ -440,7 +450,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="rearCaulkOpening" className="font-medium">
-                    Rear caulk opening present
+                    Rear caulk opening checked
                   </Label>
                 </div>
 
@@ -453,16 +463,16 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="bathroomGFCI" className="font-medium">
-                    Bathroom GFCI functional
+                    Bathroom GFCI protection verified
                   </Label>
                 </div>
               </div>
             </ChecklistSection>
 
-            {/* Section 4: Moisture & Structural */}
+            {/* Section 4: Water, Mold & Moisture Checks */}
             <ChecklistSection
-              title="4. Moisture & Structural Inspection (5 Minutes)"
-              description="Check for moisture issues and structural integrity"
+              title="4. Water, Mold & Moisture Checks (5 Minutes)"
+              description="Check for water damage and moisture issues"
             >
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
@@ -474,7 +484,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="underSinksDry" className="font-medium">
-                    Under sinks dry and clean
+                    Under sinks dry
                   </Label>
                 </div>
 
@@ -500,7 +510,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="ceilingsWallsClean" className="font-medium">
-                    Ceilings and walls clean, no stains
+                    Ceilings and walls clean
                   </Label>
                 </div>
 
@@ -552,16 +562,29 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="mainShutOffValve" className="font-medium">
-                    Main shut-off valve accessible
+                    Main Shut-Off Valve operational
+                  </Label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="mainShutOffValveExercised"
+                    checked={formData.section4.mainShutOffValveExercised}
+                    onCheckedChange={(checked) =>
+                      updateField('section4', { ...formData.section4, mainShutOffValveExercised: !!checked })
+                    }
+                  />
+                  <Label htmlFor="mainShutOffValveExercised" className="font-medium">
+                    Main Shut Off Valve Exercised
                   </Label>
                 </div>
               </div>
             </ChecklistSection>
 
-            {/* Section 5: Final Checks */}
+            {/* Section 5: Final Walk-Through & Exit */}
             <ChecklistSection
-              title="5. Final Checks (3 Minutes)"
-              description="Final inspection before leaving"
+              title="5. Final Walk-Through & Exit (1 Minute)"
+              description="Final checks before leaving"
             >
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
@@ -573,7 +596,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="allFixturesOff" className="font-medium">
-                    All fixtures turned off
+                    All fixtures turned OFF
                   </Label>
                 </div>
 
@@ -605,26 +628,27 @@ export default function ChecklistFormPage() {
               </div>
             </ChecklistSection>
 
-            <Separator className="my-6" />
-
-            {/* Notes and Issues */}
+            {/* Notes / Issues Identified */}
             <div className="space-y-2">
               <Label htmlFor="notesIssues" className="text-base font-semibold">
-                Notes & Issues
+                Notes / Issues Identified
               </Label>
               <Textarea
                 id="notesIssues"
-                placeholder="Document any issues, concerns, or additional observations"
                 value={formData.notesIssues}
                 onChange={(e) => updateField('notesIssues', e.target.value)}
-                rows={5}
+                placeholder="Enter any notes or issues identified during inspection..."
+                rows={4}
+                className="resize-none"
               />
             </div>
 
-            {/* Work Order Guidance */}
-            <div className="space-y-4 p-4 bg-muted rounded-lg">
-              <Label className="text-base font-semibold">Work Order Guidance</Label>
-              <div className="space-y-2">
+            {/* Final Work Order Guidance */}
+            <ChecklistSection
+              title="Final Work Order Guidance"
+              description="Determine if a work order is needed"
+            >
+              <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="createWorkOrder"
@@ -637,7 +661,7 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="createWorkOrder" className="font-medium">
-                    Create work order for issues found
+                    Create a Work Order (W/O)
                   </Label>
                 </div>
 
@@ -653,56 +677,19 @@ export default function ChecklistFormPage() {
                     }
                   />
                   <Label htmlFor="doNotCreateWO" className="font-medium">
-                    Do not create work order
+                    Do NOT create a W/O for minor adjustments
                   </Label>
                 </div>
               </div>
-            </div>
+            </ChecklistSection>
 
-            <Separator className="my-6" />
-
-            {/* Submit Section */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                <div className="flex items-center gap-2">
-                  {uploadStatus === 'uploading' && (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                      <span className="text-sm font-medium">Uploading to Dropbox...</span>
-                    </>
-                  )}
-                  {uploadStatus === 'success' && (
-                    <>
-                      <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                      <span className="text-sm font-medium text-emerald-600">Uploaded successfully</span>
-                    </>
-                  )}
-                  {uploadStatus === 'error' && (
-                    <>
-                      <AlertCircle className="h-5 w-5 text-destructive" />
-                      <span className="text-sm font-medium text-destructive">Upload failed</span>
-                    </>
-                  )}
-                  {uploadStatus === 'idle' && dropboxConfigured && (
-                    <>
-                      <Upload className="h-5 w-5 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Will upload to Dropbox</span>
-                    </>
-                  )}
-                  {uploadStatus === 'idle' && !dropboxConfigured && (
-                    <>
-                      <AlertCircle className="h-5 w-5 text-amber-600" />
-                      <span className="text-sm text-muted-foreground">Dropbox not configured</span>
-                    </>
-                  )}
-                </div>
-              </div>
-
+            {/* Submit Button */}
+            <div className="flex flex-col gap-4 pt-4">
               <Button
                 type="submit"
                 size="lg"
-                className="w-full"
                 disabled={isSubmitting}
+                className="w-full text-lg font-semibold"
               >
                 {isSubmitting ? (
                   <>
@@ -716,6 +703,27 @@ export default function ChecklistFormPage() {
                   </>
                 )}
               </Button>
+
+              {uploadStatus === 'uploading' && (
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Uploading to Dropbox...</span>
+                </div>
+              )}
+
+              {uploadStatus === 'success' && (
+                <div className="flex items-center justify-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span>Successfully uploaded to Dropbox</span>
+                </div>
+              )}
+
+              {uploadStatus === 'error' && (
+                <div className="flex items-center justify-center gap-2 text-sm text-destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>Upload failed</span>
+                </div>
+              )}
             </div>
           </form>
         </CardContent>

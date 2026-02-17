@@ -44,6 +44,7 @@ export function getDefaultChecklistData(): ChecklistFormData {
         secureAtBase: '',
         rearCaulkLeakage: '',
       },
+      toiletTankFreeOfCracks: '',
       rearCaulkOpening: false,
       bathroomGFCI: false,
     },
@@ -56,6 +57,7 @@ export function getDefaultChecklistData(): ChecklistFormData {
       behindRefrigeratorDry: false,
       waterHeaterAreaDry: false,
       mainShutOffValve: false,
+      mainShutOffValveExercised: false,
     },
     
     section5: {

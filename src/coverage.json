@@ -1,99 +1,59 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T20:35:54.102Z",
+  "generatedAt": "2026-02-17T22:17:56.925Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 4,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Diagnose and fix the live app failing to load across major browsers by eliminating any runtime errors during initial render (router mount, auth initialization, React Query actor creation) and ensuring the app consistently reaches the Checklist page or a clear error screen instead of a blank/sad-face page.",
+        "summary": "Add a new checklist field labeled \"Main Shut Off Valve Exercised\" to the form, store it in the checklist data model, and include it in the generated PDF output.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useActor.ts",
-          "frontend/src/App.tsx",
-          "frontend/src/components/system/InitErrorScreen.tsx",
-          "frontend/src/main.tsx"
+          "frontend/src/lib/checklist/types.ts",
+          "frontend/src/lib/checklist/defaults.ts",
+          "frontend/src/pages/ChecklistFormPage.tsx",
+          "frontend/src/lib/pdf/generateChecklistPdf.ts"
         ],
         "matchedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/components/system/InitErrorScreen.tsx"
+          "frontend/src/lib/checklist/types.ts",
+          "frontend/src/lib/checklist/defaults.ts",
+          "frontend/src/pages/ChecklistFormPage.tsx",
+          "frontend/src/lib/pdf/generateChecklistPdf.ts"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Add an in-app admin access flow initiated by a button so an authenticated user can obtain admin privileges and then access the Admin Settings page to save a Dropbox token.",
+        "summary": "In the Toilet section of the checklist form, add a new item labeled \"Toilet tank is free of cracks/leaks\", store it in the checklist data model, and include it in the generated PDF output.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/layout/Header.tsx",
-          "frontend/src/components/auth/RequireAdmin.tsx"
+          "frontend/src/lib/checklist/types.ts",
+          "frontend/src/lib/checklist/defaults.ts",
+          "frontend/src/pages/ChecklistFormPage.tsx",
+          "frontend/src/lib/pdf/generateChecklistPdf.ts"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/layout/Header.tsx"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Implement backend support for the admin access flow by adding an explicit method to grant admin privileges in a controlled way (e.g., first-admin-claim when no admins exist, or another deterministic rule), and persist the resulting role assignment using the existing authorization system so it remains effective across sessions.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Fix Dropbox upload failures by ensuring the Dropbox token is retrieved and used correctly for uploads, and that error messages shown to users are actionable (distinguish missing token vs. Dropbox API failure).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/lib/upload/uploadChecklistPdf.ts",
-          "frontend/src/pages/ChecklistFormPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/lib/upload/uploadChecklistPdf.ts",
-          "frontend/src/pages/ChecklistFormPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Ensure the Admin Settings page and token storage work end-to-end: admins can save a Dropbox access token to the backend and later see that it is configured, while non-admins are denied access with the existing AccessDeniedScreen messaging.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/AdminSettingsPage.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/AdminSettingsPage.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/lib/checklist/types.ts",
+          "frontend/src/lib/checklist/defaults.ts",
+          "frontend/src/pages/ChecklistFormPage.tsx",
+          "frontend/src/lib/pdf/generateChecklistPdf.ts"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
-    "build-template/README.md",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/layout/Header.tsx",
-    "frontend/src/components/system/InitErrorScreen.tsx",
-    "frontend/src/config.ts",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/lib/upload/uploadChecklistPdf.ts",
-    "frontend/src/pages/AdminSettingsPage.tsx",
+    "frontend/src/lib/checklist/defaults.ts",
+    "frontend/src/lib/checklist/types.ts",
+    "frontend/src/lib/pdf/generateChecklistPdf.ts",
     "frontend/src/pages/ChecklistFormPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",

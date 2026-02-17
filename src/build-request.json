@@ -1,118 +1,56 @@
 {
   "kind": "build_request",
-  "title": "Fix admin access flow and Dropbox token/upload reliability",
+  "title": "Update checklist form: add shut-off valve exercised + toilet tank cracks/leaks check",
   "projectName": "Safety Inspection",
-  "priority": "high",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Diagnose and fix the live app failing to load across major browsers by eliminating any runtime errors during initial render (router mount, auth initialization, React Query actor creation) and ensuring the app consistently reaches the Checklist page or a clear error screen instead of a blank/sad-face page.",
+      "text": "Add a new checklist field labeled \"Main Shut Off Valve Exercised\" to the form, store it in the checklist data model, and include it in the generated PDF output.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-2"
+          "msg-1"
         ],
         "quotes": [
-          "App doesn't work,  find  out why and fix it.  How hard is that to understand?"
+          "Add Main Shut Off Valve Exercised."
         ]
       },
       "acceptanceCriteria": [
-        "Opening the app in Chrome, Firefox, and Safari renders the main layout (Header + Checklist page) without a blank screen.",
-        "If authentication/actor initialization fails, the UI shows a readable error state instead of crashing.",
-        "No uncaught exceptions are logged during initial app load in the browser console."
+        "The checklist TypeScript type (frontend/src/lib/checklist/types.ts) includes a new boolean field for \"Main Shut Off Valve Exercised\" (placed in the appropriate section with the existing main shut-off valve item).",
+        "Default checklist data (frontend/src/lib/checklist/defaults.ts) initializes the new field to false.",
+        "Checklist form UI (frontend/src/pages/ChecklistFormPage.tsx) renders a checkbox with the label exactly: \"Main Shut Off Valve Exercised\" and updates the form state when toggled.",
+        "Generated PDF content (frontend/src/lib/pdf/generateChecklistPdf.ts) includes a corresponding line with an [X]/[ ] marker reflecting the user’s selection."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Add an in-app admin access flow initiated by a button so an authenticated user can obtain admin privileges and then access the Admin Settings page to save a Dropbox token.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-11",
-          "msg-12"
-        ],
-        "quotes": [
-          "No create a button that gives me admin access so i can add a drop box token",
-          "build it"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When a user is logged in but not an admin, the Header shows a clear call-to-action to obtain admin access.",
-        "Completing the admin access flow results in the user being recognized as admin (useIsCallerAdmin returns true) without requiring a manual refresh.",
-        "After admin access is granted, the Header shows the existing Admin button and the user can navigate to /admin successfully.",
-        "Non-authenticated users cannot obtain admin access and are prompted to log in first."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Implement backend support for the admin access flow by adding an explicit method to grant admin privileges in a controlled way (e.g., first-admin-claim when no admins exist, or another deterministic rule), and persist the resulting role assignment using the existing authorization system so it remains effective across sessions.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-11"
-        ],
-        "quotes": [
-          "create a button that gives me admin access so i can add a drop box token"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A new backend method exists to perform the admin grant/claim and returns a success/failure outcome without trapping for expected failure cases.",
-        "The method only grants admin when the controlled rule is satisfied; otherwise it denies the request.",
-        "After a successful grant, isCallerAdmin returns true for that principal and remains true on subsequent calls."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Fix Dropbox upload failures by ensuring the Dropbox token is retrieved and used correctly for uploads, and that error messages shown to users are actionable (distinguish missing token vs. Dropbox API failure).",
+      "text": "In the Toilet section of the checklist form, add a new item labeled \"Toilet tank is free of cracks/leaks\", store it in the checklist data model, and include it in the generated PDF output.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5",
-          "msg-6"
+          "msg-1"
         ],
         "quotes": [
-          "why is it failing to upload to dropbox?",
-          "I am submitting it on the live app"
+          "And in the toilet section, add Toilet tank is free of cracks/leaks."
         ]
       },
       "acceptanceCriteria": [
-        "If no Dropbox token is configured, submitting the checklist downloads the PDF and shows a clear message indicating Dropbox is not configured (no attempted upload).",
-        "If a token is configured, submitting the checklist attempts an upload to https://content.dropboxapi.com/2/files/upload and reports success/failure.",
-        "On Dropbox API failure, the UI displays a user-readable failure toast and logs the detailed error text for debugging.",
-        "No code path calls frontend/src/lib/upload/uploadChecklistPdf.ts in a way that throws 'must be called from component context'."
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Ensure the Admin Settings page and token storage work end-to-end: admins can save a Dropbox access token to the backend and later see that it is configured, while non-admins are denied access with the existing AccessDeniedScreen messaging.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-11"
-        ],
-        "quotes": [
-          "add a drop box token"
-        ]
-      },
-      "acceptanceCriteria": [
-        "As an admin, saving a token on /admin calls the backend and persists the token (subsequent loads show 'Dropbox token is configured').",
-        "As a non-admin, navigating to /admin shows the access denied UI (no token data is revealed).",
-        "The token is never displayed in plaintext by default in the UI (password-masked input remains the default behavior)."
+        "The checklist TypeScript type (frontend/src/lib/checklist/types.ts) includes a new field for \"Toilet tank is free of cracks/leaks\" under the existing toilet subsection, using the same value style as other yes/no fields (\"yes\" | \"no\" | \"\").",
+        "Default checklist data (frontend/src/lib/checklist/defaults.ts) initializes the new toilet tank field to an empty string.",
+        "Checklist form UI (frontend/src/pages/ChecklistFormPage.tsx) renders the new question in the toilet area using the existing YesNoField component with the label exactly: \"Toilet tank is free of cracks/leaks\".",
+        "Generated PDF content (frontend/src/lib/pdf/generateChecklistPdf.ts) includes a line for this new toilet tank item and prints the selected value (yes/no) or N/A when unset."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
-    "Do not edit any files under frontend/src/components/ui or any paths listed as immutable in SYSTEM_CONTEXT.",
-    "Use English for all user-facing UI text and error messages.",
-    "Do not introduce third-party authentication; only Internet Identity is supported.",
-    "Do not add external databases or off-platform token storage; store the Dropbox token only in the existing backend canister state."
+    "Do not modify files under frontend/src/components/ui (read-only).",
+    "Do not modify frontend/src/hooks/useInternetIdentity.ts or frontend/src/hooks/useActor.ts (immutable paths).",
+    "Keep all changes within the existing single React app and existing PDF generation approach (no new backend/service dependencies)."
   ],
   "nonGoals": [
-    "Implementing server-side (backend) Dropbox uploads (uploads remain frontend-to-Dropbox).",
-    "Adding real-time features (WebSockets), push notifications, or email/SMS integrations.",
-    "Adding support for non-Dropbox storage providers."
+    "Do not change Dropbox upload behavior or token handling as part of this request.",
+    "Do not redesign the entire form; only add the two requested fields and ensure they appear in the PDF."
   ],
   "imageRequirements": {
     "required": [],

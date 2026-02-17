@@ -2,11 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-diagnose-and-fix-the-live-app-failing-to-load-across-major-browsers-by-eliminating-any-runtime-errors-during-initial-render-router-mount-auth-initialization-react-query-actor-creation-and-ensuring-the-app-consistently-reaches-the-checklist-page-or-a-clear-error-screen-instead-of-a-blank-sad-face-page",
-      "featureTitle": "Diagnose and fix the live app failing to load across major browsers by eliminating any runtime errors during initial render (router mount, auth initialization, React Query actor creation) and ensuring the app consistently reaches the Checklist page or a clear error screen instead of a blank/sad-face page.",
+      "featureId": "feature-add-a-new-checklist-field-labeled-main-shut-off-valve-exercised-to-the-form-store-it-in-the-checklist-data-model-and-include-it-in-the-generated-pdf-output",
+      "featureTitle": "Add a new checklist field labeled \"Main Shut Off Valve Exercised\" to the form, store it in the checklist data model, and include it in the generated PDF output.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/system/InitErrorScreen.tsx"
+        "frontend/src/lib/checklist/defaults.ts",
+        "frontend/src/lib/checklist/types.ts",
+        "frontend/src/lib/pdf/generateChecklistPdf.ts",
+        "frontend/src/pages/ChecklistFormPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -23,31 +25,12 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-an-in-app-admin-access-flow-initiated-by-a-button-so-an-authenticated-user-can-obtain-admin-privileges-and-then-access-the-admin-settings-page-to-save-a-dropbox-token",
-      "featureTitle": "Add an in-app admin access flow initiated by a button so an authenticated user can obtain admin privileges and then access the Admin Settings page to save a Dropbox token.",
+      "featureId": "feature-in-the-toilet-section-of-the-checklist-form-add-a-new-item-labeled-toilet-tank-is-free-of-cracks-leaks-store-it-in-the-checklist-data-model-and-include-it-in-the-generated-pdf-output",
+      "featureTitle": "In the Toilet section of the checklist form, add a new item labeled \"Toilet tank is free of cracks/leaks\", store it in the checklist data model, and include it in the generated PDF output.",
       "files": [
-        "frontend/src/components/layout/Header.tsx",
-        "frontend/src/hooks/useQueries.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "http-outcalls@3.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-fix-dropbox-upload-failures-by-ensuring-the-dropbox-token-is-retrieved-and-used-correctly-for-uploads-and-that-error-messages-shown-to-users-are-actionable-distinguish-missing-token-vs-dropbox-api-failure",
-      "featureTitle": "Fix Dropbox upload failures by ensuring the Dropbox token is retrieved and used correctly for uploads, and that error messages shown to users are actionable (distinguish missing token vs. Dropbox API failure).",
-      "files": [
-        "frontend/src/lib/upload/uploadChecklistPdf.ts",
+        "frontend/src/lib/checklist/defaults.ts",
+        "frontend/src/lib/checklist/types.ts",
+        "frontend/src/lib/pdf/generateChecklistPdf.ts",
         "frontend/src/pages/ChecklistFormPage.tsx"
       ],
       "components": [
@@ -60,28 +43,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-4"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-ensure-the-admin-settings-page-and-token-storage-work-end-to-end-admins-can-save-a-dropbox-access-token-to-the-backend-and-later-see-that-it-is-configured-while-non-admins-are-denied-access-with-the-existing-accessdeniedscreen-messaging",
-      "featureTitle": "Ensure the Admin Settings page and token storage work end-to-end: admins can save a Dropbox access token to the backend and later see that it is configured, while non-admins are denied access with the existing AccessDeniedScreen messaging.",
-      "files": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/AdminSettingsPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "http-outcalls@3.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
+        "REQ-2"
       ],
       "confidence": "high"
     }

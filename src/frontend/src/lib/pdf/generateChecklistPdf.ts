@@ -44,6 +44,7 @@ function generatePdfContent(data: ChecklistFormData): string {
   content += `  Flush operation: ${data.section3.toiletFlushTest.flushOperation || 'N/A'}\n`;
   content += `  Secure at base: ${data.section3.toiletFlushTest.secureAtBase || 'N/A'}\n`;
   content += `  Rear caulk leakage: ${data.section3.toiletFlushTest.rearCaulkLeakage || 'N/A'}\n`;
+  content += `  Toilet tank is free of cracks/leaks: ${data.section3.toiletTankFreeOfCracks || 'N/A'}\n`;
   content += `[${data.section3.rearCaulkOpening ? 'X' : ' '}] Rear Caulk Opening checked\n`;
   content += `[${data.section3.bathroomGFCI ? 'X' : ' '}] Bathroom GFCI Protection verified\n\n`;
   
@@ -54,7 +55,8 @@ function generatePdfContent(data: ChecklistFormData): string {
   content += `[${data.section4.windowsSillsDoorsDry ? 'X' : ' '}] Windows, sills, and doors dry\n`;
   content += `[${data.section4.behindRefrigeratorDry ? 'X' : ' '}] Behind refrigerator dry\n`;
   content += `[${data.section4.waterHeaterAreaDry ? 'X' : ' '}] Water heater area dry\n`;
-  content += `[${data.section4.mainShutOffValve ? 'X' : ' '}] Main Shut-Off Valve operational\n\n`;
+  content += `[${data.section4.mainShutOffValve ? 'X' : ' '}] Main Shut-Off Valve operational\n`;
+  content += `[${data.section4.mainShutOffValveExercised ? 'X' : ' '}] Main Shut Off Valve Exercised\n\n`;
   
   content += '5. FINAL WALK-THROUGH & EXIT (1 Minute)\n';
   content += `[${data.section5.allFixturesOff ? 'X' : ' '}] All fixtures turned OFF\n`;

@@ -1,106 +1,69 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Safety Inspection — Stabilize initial load, add admin-claim CTA, and harden Dropbox upload UX",
+  "title": "Checklist form + PDF: add Main Shut Off Valve Exercised and Toilet tank cracks/leaks item",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Eliminate initial-render runtime crashes and ensure the app always renders Checklist or a readable error screen.",
+      "summary": "Add \"Main Shut Off Valve Exercised\" boolean field to checklist data, render checkbox in the form near the existing main shut-off valve item, and include it in the generated PDF.",
       "acceptanceCriteria": [
-        "Opening the app in Chrome, Firefox, and Safari renders the main layout (Header + Checklist page) without a blank screen.",
-        "If authentication/actor initialization fails, the UI shows a readable error state instead of crashing.",
-        "No uncaught exceptions are logged during initial app load in the browser console."
+        "The checklist TypeScript type (frontend/src/lib/checklist/types.ts) includes a new boolean field for \"Main Shut Off Valve Exercised\" (placed in the appropriate section with the existing main shut-off valve item).",
+        "Default checklist data (frontend/src/lib/checklist/defaults.ts) initializes the new field to false.",
+        "Checklist form UI (frontend/src/pages/ChecklistFormPage.tsx) renders a checkbox with the label exactly: \"Main Shut Off Valve Exercised\" and updates the form state when toggled.",
+        "Generated PDF content (frontend/src/lib/pdf/generateChecklistPdf.ts) includes a corresponding line with an [X]/[ ] marker reflecting the user’s selection."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useActor.ts",
+          "path": "frontend/src/lib/checklist/types.ts",
           "operation": "modify",
-          "description": "Harden actor initialization: catch and surface initialization errors (e.g., access-control initialization, actor creation) instead of letting them throw during React Query execution; expose an explicit actor initialization error state to the app so initial load can render a clear error screen."
+          "description": "Extend the ChecklistFormData type to include a new boolean field for \"Main Shut Off Valve Exercised\" within the same section as the existing main shut-off valve item (section4)."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/lib/checklist/defaults.ts",
           "operation": "modify",
-          "description": "Add a top-level app initialization/error gate so the RouterProvider never results in a blank screen: if actor/auth bootstrap reports an error, render a dedicated error screen with readable guidance; otherwise render the normal layout (Header + Checklist page). Use the selected \"authorization\" component expectations for Internet Identity initialization and cached data clearing patterns; verify the component's usage instructions before implementing."
+          "description": "Initialize the new \"Main Shut Off Valve Exercised\" boolean field to false in getDefaultChecklistData(), keeping it grouped with the existing section4 main shut-off valve defaults."
         },
         {
-          "path": "frontend/src/components/system/InitErrorScreen.tsx",
-          "operation": "create",
-          "description": "Create a reusable, readable initialization error screen (non-crashing UI) that can be shown when auth/actor/router bootstrap fails, including a suggested user action (e.g., retry, log in again)."
+          "path": "frontend/src/pages/ChecklistFormPage.tsx",
+          "operation": "modify",
+          "description": "Render a new checkbox with label exactly \"Main Shut Off Valve Exercised\" near the existing main shut-off valve checkbox and wire onCheckedChange to update the new section4 field in form state."
         },
         {
-          "path": "frontend/src/main.tsx",
+          "path": "frontend/src/lib/pdf/generateChecklistPdf.ts",
           "operation": "modify",
-          "description": "Wrap the app in a last-resort React error boundary (or equivalent) so unexpected render-time exceptions during initial mount display the InitErrorScreen instead of a blank/sad-face page."
+          "description": "Update PDF content generation to include a new line item for \"Main Shut Off Valve Exercised\" using the existing checkbox marker style ([X]/[ ]) and reflecting the new boolean field value."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add an in-app admin access claim flow initiated by a button for authenticated users, unlocking /admin without refresh.",
+      "summary": "Add \"Toilet tank is free of cracks/leaks\" yes/no field under the Toilet subsection, render it using the existing YesNoField UI, and include its value in the generated PDF output.",
       "acceptanceCriteria": [
-        "When a user is logged in but not an admin, the Header shows a clear call-to-action to obtain admin access.",
-        "Completing the admin access flow results in the user being recognized as admin (useIsCallerAdmin returns true) without requiring a manual refresh.",
-        "After admin access is granted, the Header shows the existing Admin button and the user can navigate to /admin successfully.",
-        "Non-authenticated users cannot obtain admin access and are prompted to log in first."
+        "The checklist TypeScript type (frontend/src/lib/checklist/types.ts) includes a new field for \"Toilet tank is free of cracks/leaks\" under the existing toilet subsection, using the same value style as other yes/no fields (\"yes\" | \"no\" | \"\").",
+        "Default checklist data (frontend/src/lib/checklist/defaults.ts) initializes the new toilet tank field to an empty string.",
+        "Checklist form UI (frontend/src/pages/ChecklistFormPage.tsx) renders the new question in the toilet area using the existing YesNoField component with the label exactly: \"Toilet tank is free of cracks/leaks\".",
+        "Generated PDF content (frontend/src/lib/pdf/generateChecklistPdf.ts) includes a line for this new toilet tank item and prints the selected value (yes/no) or N/A when unset."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/lib/checklist/types.ts",
           "operation": "modify",
-          "description": "Add React Query hooks/mutations to support the admin-claim flow using existing backend capabilities (areAdminPrivilegesAvailable, claimAdminPrivileges). Ensure successful claim invalidates/refetches admin-related queries so UI updates without refresh. Use the selected \"authorization\" component patterns for role/admin queries and cache invalidation; verify the component's usage instructions before implementing."
+          "description": "Add a new \"yes\" | \"no\" | \"\" field for \"Toilet tank is free of cracks/leaks\" under the existing toilet-related subsection (within section3 near the existing toiletFlushTest fields) to match the app’s existing yes/no value style."
         },
         {
-          "path": "frontend/src/components/layout/Header.tsx",
+          "path": "frontend/src/lib/checklist/defaults.ts",
           "operation": "modify",
-          "description": "Implement the Header CTA for authenticated non-admin users to obtain admin access (and prompt login when unauthenticated). On success, immediately refresh admin status and reveal the existing Admin navigation. Use the selected \"authorization\" component guidance for login/logout and cached data clearing; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/auth/RequireAdmin.tsx",
-          "operation": "modify",
-          "description": "Ensure /admin access behavior cleanly distinguishes: not logged in (prompt to log in), logged in but not admin (show AccessDeniedScreen), and loading states. Keep messaging in English and avoid crashes while admin status is being determined."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Make Dropbox uploads reliable by retrieving/using the token correctly, improving error messages, and removing invalid component-context usage.",
-      "acceptanceCriteria": [
-        "If no Dropbox token is configured, submitting the checklist downloads the PDF and shows a clear message indicating Dropbox is not configured (no attempted upload).",
-        "If a token is configured, submitting the checklist attempts an upload to https://content.dropboxapi.com/2/files/upload and reports success/failure.",
-        "On Dropbox API failure, the UI displays a user-readable failure toast and logs the detailed error text for debugging.",
-        "No code path calls frontend/src/lib/upload/uploadChecklistPdf.ts in a way that throws 'must be called from component context'."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/lib/upload/uploadChecklistPdf.ts",
-          "operation": "modify",
-          "description": "Refactor uploadChecklistPdf to be a pure utility (no hooks) that accepts the Dropbox token as an argument and returns a structured success/error result (including response text/status) rather than throwing a component-context error."
+          "description": "Initialize the new toilet tank yes/no field to an empty string in getDefaultChecklistData() under the same toilet-related subsection where the type was added."
         },
         {
           "path": "frontend/src/pages/ChecklistFormPage.tsx",
           "operation": "modify",
-          "description": "Use the refactored uploadChecklistPdf utility and existing token query to drive upload behavior: if token missing, skip upload and show a clear 'Dropbox is not configured' message; if upload fails, show actionable toast text and console-log the detailed Dropbox error body for debugging."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Ensure Admin Settings token configuration works end-to-end with proper admin gating and secure UI behavior.",
-      "acceptanceCriteria": [
-        "As an admin, saving a token on /admin calls the backend and persists the token (subsequent loads show 'Dropbox token is configured').",
-        "As a non-admin, navigating to /admin shows the access denied UI (no token data is revealed).",
-        "The token is never displayed in plaintext by default in the UI (password-masked input remains the default behavior)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/AdminSettingsPage.tsx",
-          "operation": "modify",
-          "description": "Tighten end-to-end token UX: keep password-masked input as default, ensure post-save state reliably reflects configuration (via query invalidation/refetch), and present English error messaging that does not leak token content."
+          "description": "In the Toilet area (near the existing Toilet Flush Test questions), render the new question using the existing YesNoField component with label exactly \"Toilet tank is free of cracks/leaks\", and wire its onChange to update the new field in form state."
         },
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/lib/pdf/generateChecklistPdf.ts",
           "operation": "modify",
-          "description": "Ensure setDropboxToken success invalidates/refetches the Dropbox token query so /admin reflects 'Dropbox token is configured' on subsequent loads and immediately after save."
+          "description": "Add PDF output for the new toilet tank item, printing the selected value (yes/no) and showing N/A when the field is unset (empty string), consistent with other yes/no PDF lines."
         }
       ]
     }
