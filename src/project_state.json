@@ -1,16 +1,13 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 7,
+  "projectStateVersion": 3,
   "summary": "Build a web app that recreates a two-page checklist document as a fillable digital form (same section order/layout), generates a simplified PDF on submission, allows PDF download, and automatically uploads the PDF to a shared Dropbox account using an admin-provided access token with the filename based on selected room number.",
   "architectural_notes": [
     "Dropbox uploads use a single shared Dropbox account configured by an admin via an access token stored in app settings.",
     "On form submission: generate a simplified PDF, name it using the selected room number, upload to Dropbox, and provide a download option."
   ],
-  "known_issues": [
-    "PDF download works on desktop but fails on mobile (\"page failed to load\"/error when downloading on phone).",
-    "App stuck on infinite \"Loading...\" screen and does not load at all (no error message) on both desktop and mobile, even when using the latest Caffeine draft link."
-  ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-create-a-two-page-fillable-digital-form-that-recreates-the-uploaded-courtesy-safety-health-inspection-checklist-in-the-same-section-order-as-the-photos-including-all-fields-shown-across-both-uploaded-images",
@@ -59,46 +56,6 @@
         "REQ-7"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-fix-the-pdf-download-flow-so-that-downloading-the-generated-pdf-works-reliably-on-mobile-browsers-especially-ios-safari-where-the-current-download-action-can-fail-with-a-page-load-error",
-      "title": "Fix the PDF download flow so that downloading the generated PDF works reliably on mobile browsers (especially iOS Safari) where the current download action can fail with a page load error.",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-there-is-a-visible-clickable-button-in-the-main-ui-that-navigates-to-the-admin-settings-page-admin-so-an-admin-can-access-the-dropbox-token-settings-from-the-app-without-manually-typing-the-url",
-      "title": "Ensure there is a visible, clickable button in the main UI that navigates to the Admin Settings page (/admin) so an admin can access the Dropbox token settings from the app without manually typing the URL.",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-remove-the-nested-react-query-provider-so-the-app-uses-a-single-queryclientprovider-the-one-already-wrapping-the-app-in-frontend-src-main-tsx-and-ensure-all-hooks-components-use-that-single-provider-instance",
-      "title": "Remove the nested React Query provider so the app uses a single QueryClientProvider (the one already wrapping the app in frontend/src/main.tsx), and ensure all hooks/components use that single provider instance.",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-make-the-initial-app-loading-state-fail-safe-if-internet-identity-initialization-remains-in-the-initializing-state-longer-than-a-reasonable-timeout-e-g-8-10-seconds-stop-blocking-the-entire-ui-and-render-the-main-app-with-anonymous-access-while-showing-a-clear-dismissible-warning-banner-that-authentication-initialization-is-taking-longer-than-expected",
-      "title": "Make the initial app loading state fail-safe: if Internet Identity initialization remains in the \"initializing\" state longer than a reasonable timeout (e.g., 8–10 seconds), stop blocking the entire UI and render the main app with anonymous access, while showing a clear, dismissible warning banner that authentication initialization is taking longer than expected.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-non-blocking-error-ui-path-for-authentication-initialization-failures-when-the-internet-identity-hook-reports-a-login-initialization-error-render-the-app-do-not-block-on-a-full-page-loader-and-show-a-visible-error-message-with-a-reload-action",
-      "title": "Add a non-blocking error UI path for authentication initialization failures: when the Internet Identity hook reports a login/initialization error, render the app (do not block on a full-page loader) and show a visible error message with a \"Reload\" action.",
-      "reqIds": [
-        "REQ-12"
-      ],
-      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -126,12 +83,6 @@
       "reqIds": [
         "REQ-6"
       ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-10",
-      "summary": "Add a button in the main UI that the user can press to access/open the admin section (admin settings).",
-      "reqIds": [],
       "status": "pending"
     }
   ],

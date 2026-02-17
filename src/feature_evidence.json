@@ -2,10 +2,15 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-remove-the-nested-react-query-provider-so-the-app-uses-a-single-queryclientprovider-the-one-already-wrapping-the-app-in-frontend-src-main-tsx-and-ensure-all-hooks-components-use-that-single-provider-instance",
-      "featureTitle": "Remove the nested React Query provider so the app uses a single QueryClientProvider (the one already wrapping the app in frontend/src/main.tsx), and ensure all hooks/components use that single provider instance.",
+      "featureId": "feature-create-a-two-page-fillable-digital-form-that-recreates-the-uploaded-courtesy-safety-health-inspection-checklist-in-the-same-section-order-as-the-photos-including-all-fields-shown-across-both-uploaded-images",
+      "featureTitle": "Create a two-page fillable digital form that recreates the uploaded “Courtesy Safety & Health Inspection Checklist” in the same section order as the photos, including all fields shown across both uploaded images.",
       "files": [
-        "frontend/src/App.tsx"
+        "frontend/src/App.tsx",
+        "frontend/src/components/checklist/ChecklistSection.tsx",
+        "frontend/src/components/checklist/YesNoField.tsx",
+        "frontend/src/lib/checklist/defaults.ts",
+        "frontend/src/lib/checklist/types.ts",
+        "frontend/src/pages/ChecklistFormPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,16 +22,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-10"
+        "REQ-1"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-make-the-initial-app-loading-state-fail-safe-if-internet-identity-initialization-remains-in-the-initializing-state-longer-than-a-reasonable-timeout-e-g-8-10-seconds-stop-blocking-the-entire-ui-and-render-the-main-app-with-anonymous-access-while-showing-a-clear-dismissible-warning-banner-that-authentication-initialization-is-taking-longer-than-expected",
-      "featureTitle": "Make the initial app loading state fail-safe: if Internet Identity initialization remains in the \"initializing\" state longer than a reasonable timeout (e.g., 8–10 seconds), stop blocking the entire UI and render the main app with anonymous access, while showing a clear, dismissible warning banner that authentication initialization is taking longer than expected.",
+      "featureId": "feature-add-a-required-room-number-selection-input-that-is-used-as-the-pdf-filename-for-both-download-and-dropbox-upload-when-a-submission-is-completed",
+      "featureTitle": "Add a required “Room Number” selection/input that is used as the PDF filename for both download and Dropbox upload when a submission is completed.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/auth/AuthInitStatusBanner.tsx"
+        "frontend/src/lib/pdf/filename.ts",
+        "frontend/src/pages/ChecklistFormPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -38,16 +43,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-11"
+        "REQ-2"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-non-blocking-error-ui-path-for-authentication-initialization-failures-when-the-internet-identity-hook-reports-a-login-initialization-error-render-the-app-do-not-block-on-a-full-page-loader-and-show-a-visible-error-message-with-a-reload-action",
-      "featureTitle": "Add a non-blocking error UI path for authentication initialization failures: when the Internet Identity hook reports a login/initialization error, render the app (do not block on a full-page loader) and show a visible error message with a \"Reload\" action.",
+      "featureId": "feature-on-form-submission-generate-a-simplified-pdf-representation-of-the-submitted-checklist-data-and-provide-an-immediate-pdf-download-to-the-user",
+      "featureTitle": "On form submission, generate a simplified PDF representation of the submitted checklist data and provide an immediate PDF download to the user.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/auth/AuthInitStatusBanner.tsx"
+        "frontend/src/lib/pdf/downloadPdf.ts",
+        "frontend/src/lib/pdf/generateChecklistPdf.ts",
+        "frontend/src/pages/ChecklistFormPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -59,7 +65,74 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-12"
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-an-admin-settings-page-where-an-admin-can-paste-and-save-a-dropbox-access-token-that-will-be-used-for-all-uploads-to-a-single-shared-dropbox-account",
+      "featureTitle": "Implement an admin settings page where an admin can paste and save a Dropbox access token that will be used for all uploads to a single shared Dropbox account.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/auth/AccessDeniedScreen.tsx",
+        "frontend/src/components/auth/RequireAdmin.tsx",
+        "frontend/src/pages/AdminSettingsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "http-outcalls@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-automatically-upload-the-generated-pdf-to-dropbox-upon-successful-form-submission-using-the-admin-provided-access-token-storing-the-file-in-the-shared-dropbox-account-with-the-filename-based-on-room-number",
+      "featureTitle": "Automatically upload the generated PDF to Dropbox upon successful form submission using the admin-provided access token, storing the file in the shared Dropbox account with the filename based on Room Number.",
+      "files": [
+        "frontend/src/lib/upload/uploadChecklistPdf.ts",
+        "frontend/src/pages/ChecklistFormPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "http-outcalls@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-a-coherent-distinct-visual-theme-for-the-app-and-apply-it-consistently-across-pages-and-components-without-using-a-blue-purple-primary-palette",
+      "featureTitle": "Create a coherent, distinct visual theme for the app and apply it consistently across pages and components (without using a blue/purple primary palette).",
+      "files": [
+        "frontend/src/index.css",
+        "frontend/src/pages/AdminSettingsPage.tsx",
+        "frontend/src/pages/ChecklistFormPage.tsx",
+        "frontend/tailwind.config.js"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "http-outcalls@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
       ],
       "confidence": "high"
     }

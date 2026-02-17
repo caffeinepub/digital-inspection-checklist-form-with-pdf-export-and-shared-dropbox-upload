@@ -1,25 +1,133 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T04:43:11.640Z",
-  "summary": "REQ-11 and REQ-12 appear implemented via a timeout-based, non-blocking auth initialization flow in App.tsx plus a new dismissible status banner component. REQ-10 (removal of a nested React Query provider / ensuring a single QueryClientProvider instance) is not evidenced in the provided diff summary.",
+  "generatedAt": "2026-02-12T15:19:09.464Z",
+  "summary": "Diff adds a Motoko backend actor with access-control hooks and Dropbox token storage, plus a new React app shell with routing, auth/profile setup, checklist data types/defaults, PDF byte generation utilities, and a (currently non-functional) Dropbox upload helper. Core requested flows (complete two-page checklist form, submit->PDF download, and automatic Dropbox upload) are not fully evidenced in the provided diff summary, and several unrequested features (user profiles, PDF storage/browsing) were added.",
   "missing_requirements": [
     {
-      "id": "REQ-10",
-      "requirement": "Remove the nested React Query provider so the app uses a single QueryClientProvider (the one already wrapping the app in frontend/src/main.tsx), and ensure all hooks/components use that single provider instance.",
-      "reason": "The diff summary shows changes focused on auth initialization timeout/error UI (App.tsx + new banner component) but contains no evidence of removing a nested QueryClientProvider or refactoring React Query provider usage. No QueryClientProvider-related changes are shown.",
+      "id": "REQ-1",
+      "requirement": "Create a two-page fillable digital form that recreates the uploaded checklist with all fields across both images, in the same section order, with appropriate inputs including Yes/No items.",
+      "reason": "The diff shows checklist data structures for a subset of sections/items, but does not show the actual form UI implementation or evidence that all line items from both uploaded images are represented. The only visible checklist modeling (types/defaults) appears incomplete relative to the stated scope (“all fields shown across both uploaded images”).",
       "evidence": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/auth/AuthInitStatusBanner.tsx"
+        "frontend/src/lib/checklist/types.ts",
+        "frontend/src/lib/checklist/defaults.ts",
+        "frontend/src/App.tsx (imports ChecklistFormPage but page implementation not shown)"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "Add a required Room Number input that blocks submission until provided and is used as the PDF filename for download and Dropbox upload.",
+      "reason": "Room number exists in the data model and there is filename sanitization, but no submission UI/validation is shown, and Dropbox upload helper uses raw roomNumber (not sanitized) and is not wired to any submit flow in the visible diff.",
+      "evidence": [
+        "frontend/src/lib/checklist/types.ts",
+        "frontend/src/lib/checklist/defaults.ts",
+        "frontend/src/lib/pdf/filename.ts",
+        "frontend/src/App.tsx (ChecklistFormPage imported; submit behavior not shown)"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "On form submission, generate a simplified PDF from current form values and provide immediate download.",
+      "reason": "PDF generation and a download helper are present, but the diff does not show a submission handler that calls generateChecklistPdf() and then triggers downloadPdf() after submit, nor does it show the final PDF content generation is complete (file is truncated).",
+      "evidence": [
+        "frontend/src/lib/pdf/generateChecklistPdf.ts",
+        "frontend/src/lib/pdf/downloadPdf.ts",
+        "frontend/src/App.tsx (ChecklistFormPage imported; submit behavior not shown)"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Admin settings page to paste/save Dropbox access token persisted in backend with success/error feedback and without exposing the token after save.",
+      "reason": "Backend provides set/get Dropbox token with admin-only gating, and there is an admin route wrapper, but the actual Admin Settings UI (field, save action, masking/“token is set” indicator, success/error display) is not shown in the diff summary.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/App.tsx (route '/admin' uses AdminSettingsPage, but page code not shown)",
+        "frontend/src/components/auth/RequireAdmin.tsx",
+        "frontend/src/hooks/useQueries.ts (useGetDropboxToken/useSetDropboxToken)"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "requirement": "Automatically upload generated PDF to Dropbox on successful submission using admin token, show upload status, handle missing token with clear message, and avoid claiming success on failure.",
+      "reason": "Dropbox upload helper is not usable as written: it throws an error because token retrieval is unimplemented. No evidence shows the submit flow triggers Dropbox upload, tracks uploading/success/failure states, or handles missing token gracefully.",
+      "evidence": [
+        "frontend/src/lib/upload/uploadChecklistPdf.ts (token retrieval throws; upload not wired)"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "requirement": "Backend enforces admin-only updates for Dropbox token and defines admin identity (e.g., installer) and frontend shows access-denied for non-admin on Admin Settings.",
+      "reason": "Backend enforces admin permission check in setDropboxToken, and frontend has RequireAdmin, but the diff does not show how the admin is determined (e.g., installer principal) within the backend’s access control modules (not included). Also, the AdminSettingsPage behavior for access denied is not shown (RequireAdmin exists but not evidenced as used on the page).",
+      "evidence": [
+        "backend/main.mo (setDropboxToken permission check; admin determination not shown)",
+        "frontend/src/components/auth/RequireAdmin.tsx",
+        "frontend/src/hooks/useActor.ts (calls actor._initializeAccessControlWithSecret)"
       ]
     }
   ],
-  "hallucinated_features": [],
+  "hallucinated_features": [
+    {
+      "description": "User profile setup flow (prompting for name and saving per-principal profiles) unrelated to checklist/PDF/Dropbox requirements.",
+      "reason": "BuildRequest does not request user profiles; only Internet Identity is mentioned for auth and admin gating.",
+      "evidence": [
+        "backend/main.mo (UserProfile types and save/get profile methods)",
+        "frontend/src/components/auth/ProfileSetupModal.tsx",
+        "frontend/src/hooks/useQueries.ts (useGetCallerUserProfile/useSaveCallerUserProfile)",
+        "frontend/src/App.tsx (ProfileSetupModal usage)"
+      ]
+    },
+    {
+      "description": "Backend storage and retrieval APIs for PDFs (getPdf, getAllSortedByRoom) implying historical submission storage/browsing.",
+      "reason": "BuildRequest non-goals explicitly say not to store/browse historical submissions unless required for Dropbox upload; the shown backend adds PDF storage and listing endpoints, but no requirement calls for these endpoints.",
+      "evidence": [
+        "backend/main.mo (pdfs map, getPdf, getAllSortedByRoom)"
+      ]
+    },
+    {
+      "description": "Backend uploadPdf endpoint stub that traps and states upload should be frontend-only.",
+      "reason": "BuildRequest requires automatic Dropbox upload, but does not ask for a backend upload endpoint (and the endpoint here is non-functional). This is additional surface area not requested.",
+      "evidence": [
+        "backend/main.mo (uploadPdf traps)"
+      ]
+    },
+    {
+      "description": "Secret-token based access-control initialization via URL parameter (caffeineAdminToken).",
+      "reason": "BuildRequest asks for admin identity based protection (e.g., installer) and does not mention an admin secret token bootstrap via URL parameters.",
+      "evidence": [
+        "frontend/src/hooks/useActor.ts (getSecretParameter('caffeineAdminToken'), _initializeAccessControlWithSecret)"
+      ]
+    }
+  ],
   "confidence": 0.62,
   "changed_files": [
+    "all_files_summary.json",
+    "backend/main.mo",
     "frontend-file-summaries.txt",
+    "frontend/index.css",
+    "frontend/index.html",
     "frontend/src/App.tsx",
-    "frontend/src/components/auth/AuthInitStatusBanner.tsx",
+    "frontend/src/components/auth/AccessDeniedScreen.tsx",
+    "frontend/src/components/auth/ProfileSetupModal.tsx",
+    "frontend/src/components/auth/RequireAdmin.tsx",
+    "frontend/src/components/checklist/ChecklistSection.tsx",
+    "frontend/src/components/checklist/YesNoField.tsx",
+    "frontend/src/components/layout/Footer.tsx",
+    "frontend/src/components/layout/Header.tsx",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/index.css",
+    "frontend/src/lib/checklist/defaults.ts",
+    "frontend/src/lib/checklist/types.ts",
+    "frontend/src/lib/pdf/downloadPdf.ts",
+    "frontend/src/lib/pdf/filename.ts",
+    "frontend/src/lib/pdf/generateChecklistPdf.ts",
+    "frontend/src/lib/upload/uploadChecklistPdf.ts",
+    "frontend/src/main.tsx",
+    "frontend/src/pages/AdminSettingsPage.tsx",
+    "frontend/src/pages/ChecklistFormPage.tsx",
+    "frontend/src/utils/urlParams.ts",
+    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }

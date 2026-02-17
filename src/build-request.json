@@ -1,74 +1,155 @@
 {
   "kind": "build_request",
-  "title": "Fix infinite Loading screen preventing app from rendering",
-  "priority": "high",
+  "title": "Digital inspection checklist form with PDF export and shared Dropbox upload",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-10",
-      "text": "Remove the nested React Query provider so the app uses a single QueryClientProvider (the one already wrapping the app in frontend/src/main.tsx), and ensure all hooks/components use that single provider instance.",
+      "id": "REQ-1",
+      "text": "Create a two-page fillable digital form that recreates the uploaded “Courtesy Safety & Health Inspection Checklist” in the same section order as the photos, including all fields shown across both uploaded images.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "recent-messages"
         ],
         "quotes": [
-          "App is stuck on the loading screen",
-          "The app doesn't even load.  It just says loading...",
-          "generate a fix"
+          "make a digital version of this document",
+          "Yes the app should recreate the checklist as a fillable digital form with the same layout.",
+          "Yes the uploaded images are a part of the same checklist. Include both in the digital form.",
+          "Yes they the form needs to be in the same order as the photo"
         ]
       },
       "acceptanceCriteria": [
-        "The app no longer renders an infinite \"Loading...\" screen on initial load on both desktop and mobile.",
-        "There is exactly one QueryClientProvider wrapping the app at runtime (no nested providers causing multiple query clients).",
-        "Core flows still work after the change: Checklist page renders, Login/Logout button renders, and /admin route can be reached (with expected access control behavior)."
+        "The UI contains the checklist title/header area with inputs for Inspector, Date, and Unit/Area (as shown in the images).",
+        "The UI includes checklist sections in the same order as the images (e.g., Entry & Initial Conditions; Lighting & Electrical; Bathroom Inspection; Water, Mold & Moisture Checks; Final Walk-Through & Exit; Notes/Issues Identified; Final Work Order Guidance).",
+        "Each checklist line item shown in the uploaded images is represented by an appropriate input (checkbox/radio/text/number) and is editable.",
+        "Bathroom Inspection items shown on page 2 include Yes/No style inputs where present in the images (e.g., Toilet Flush Test sub-items with Yes/No)."
       ]
     },
     {
-      "id": "REQ-11",
-      "text": "Make the initial app loading state fail-safe: if Internet Identity initialization remains in the \"initializing\" state longer than a reasonable timeout (e.g., 8–10 seconds), stop blocking the entire UI and render the main app with anonymous access, while showing a clear, dismissible warning banner that authentication initialization is taking longer than expected.",
+      "id": "REQ-2",
+      "text": "Add a required “Room Number” selection/input that is used as the PDF filename for both download and Dropbox upload when a submission is completed.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "recent-messages"
         ],
         "quotes": [
-          "the app doesn't even load at all.  no error message..  This happens on both mobile and desktop"
+          "I select the room number as the name of the pdf"
         ]
       },
       "acceptanceCriteria": [
-        "If the auth initialization does not complete within the timeout, the Checklist page renders instead of staying on the blocking loading screen.",
-        "The user sees English UI text explaining that sign-in initialization is delayed, and can still use the app anonymously (where permitted).",
-        "If auth initialization later completes successfully, the banner disappears and the authenticated state updates without requiring a hard refresh."
+        "The user cannot submit the form without providing a Room Number.",
+        "On successful submission, the generated PDF filename uses the Room Number (e.g., \"<RoomNumber>.pdf\")."
       ]
     },
     {
-      "id": "REQ-12",
-      "text": "Add a non-blocking error UI path for authentication initialization failures: when the Internet Identity hook reports a login/initialization error, render the app (do not block on a full-page loader) and show a visible error message with a \"Reload\" action.",
+      "id": "REQ-3",
+      "text": "On form submission, generate a simplified PDF representation of the submitted checklist data and provide an immediate PDF download to the user.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "recent-messages"
         ],
         "quotes": [
-          "no error message.."
+          "A simplified PDF version is acceptable.",
+          "make it so i can download a pdf"
         ]
       },
       "acceptanceCriteria": [
-        "When authentication initialization fails, the app does not get stuck behind \"Loading...\".",
-        "An English error message is visible (not only in console), and a reload button is available.",
-        "Normal unauthenticated usage remains possible (e.g., viewing and filling the checklist) even if auth init fails."
+        "Submitting a completed form generates a PDF that includes the Room Number, Inspector, Date, Unit/Area, and the checklist responses in readable text form (layout does not need to match the original precisely).",
+        "The user can download the generated PDF to their device after submission.",
+        "The generated PDF content reflects the current values entered into the digital form."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Implement an admin settings page where an admin can paste and save a Dropbox access token that will be used for all uploads to a single shared Dropbox account.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "The submissions all go to the same dropbox account determined by admin",
+          "Yes, the admin should paste an access token into an admin settings page"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The app includes an Admin Settings screen with a field to paste a Dropbox access token and a Save action.",
+        "The token is persisted in the backend so it remains available after page reloads.",
+        "The UI displays a clear success/error state after saving the token.",
+        "The saved token is not exposed in the UI after saving (e.g., masked display or only \"token is set\" indicator)."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Automatically upload the generated PDF to Dropbox upon successful form submission using the admin-provided access token, storing the file in the shared Dropbox account with the filename based on Room Number.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "when a form is submitted... it automatically sends to the dropbox",
+          "The submissions all go to the same dropbox account determined by admin"
+        ]
+      },
+      "acceptanceCriteria": [
+        "If a Dropbox token is configured, submitting the form triggers an upload attempt to Dropbox for the generated PDF.",
+        "The upload uses the Room Number-based filename (\"<RoomNumber>.pdf\").",
+        "The UI shows upload status (uploading/success/failure) and does not claim success if the Dropbox API call fails.",
+        "If the Dropbox token is missing, the app still allows PDF download and shows a clear message that Dropbox upload is not configured."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Add basic admin protection for the Dropbox token settings so only an admin identity can set/replace the token.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "admin settings page",
+          "dropbox account determined by admin"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend rejects token update attempts from non-admin callers with a clear error.",
+        "Backend provides a way to determine who the admin is (e.g., initial admin is the canister installer) and uses that for authorization checks.",
+        "Frontend shows an access-denied state if a non-admin navigates to Admin Settings."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Create a coherent, distinct visual theme for the app and apply it consistently across pages and components (without using a blue/purple primary palette).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "build the app"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The app has a consistent typography, spacing, and component styling suitable for a checklist/inspection workflow.",
+        "Primary color styling is not blue/purple.",
+        "Form sections are visually separated and easy to scan (e.g., section headers, dividers, grouping)."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files in frontend immutablePaths, including frontend/src/main.tsx and frontend/src/hooks/useInternetIdentity.ts.",
-    "Keep the backend as a single Motoko actor; no new backend services.",
-    "All user-facing text must be in English."
+    "Backend must remain a single Motoko actor (all backend logic in backend/main.mo).",
+    "Do not edit files under frontend/src/components/ui or other immutablePaths listed in SYSTEM_CONTEXT; compose them instead.",
+    "Use English for all user-facing text.",
+    "Dropbox authentication must be implemented via an admin-pasted access token (no per-user Dropbox OAuth)."
   ],
   "nonGoals": [
-    "Adding new product features unrelated to the loading issue (e.g., new checklist fields, new admin capabilities).",
-    "Changing Internet Identity implementation details inside frontend/src/hooks/useInternetIdentity.ts (immutable).",
-    "Backend schema migrations unless a concrete state incompatibility is discovered during implementation."
+    "Exact pixel-perfect PDF layout matching the original document.",
+    "Storing or browsing historical submissions (unless required for the Dropbox upload flow).",
+    "Per-user Dropbox accounts or third-party auth beyond Internet Identity.",
+    "Real-time collaboration or chat."
   ],
   "imageRequirements": {
     "required": [],
