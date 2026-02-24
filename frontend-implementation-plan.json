@@ -1,0 +1,103 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Add three new inspection items to checklist",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Add 'Is the washer drain properly secured in the drain pipe?' to the plumbing/laundry section",
+      "acceptanceCriteria": [
+        "The new question appears in the plumbing/laundry section of the checklist",
+        "The item uses the same YesNoField component as other checklist items",
+        "The field value is included in the generated PDF output",
+        "The default value is stored in defaults.ts and the type is defined in types.ts"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/checklist/types.ts",
+          "operation": "modify",
+          "description": "Add washerDrainSecured field to the plumbing/laundry section type definition to support the new yes/no checklist item"
+        },
+        {
+          "path": "frontend/src/lib/checklist/defaults.ts",
+          "operation": "modify",
+          "description": "Add washerDrainSecured with default value 'noAnswer' to the plumbing/laundry section in the default checklist structure"
+        },
+        {
+          "path": "frontend/src/pages/ChecklistFormPage.tsx",
+          "operation": "modify",
+          "description": "Add YesNoField for washerDrainSecured with label 'Is the washer drain properly secured in the drain pipe?' in the plumbing/laundry section of the form, following the existing field pattern"
+        },
+        {
+          "path": "frontend/src/lib/pdf/generateChecklistPdf.ts",
+          "operation": "modify",
+          "description": "Include the washerDrainSecured field and its value in the PDF generation output for the plumbing/laundry section"
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Add 'If there are any gas burning appliances, test for Carbon Monoxide.' to the safety/appliances section",
+      "acceptanceCriteria": [
+        "The new question appears in the safety/appliances section of the checklist",
+        "The item uses the same YesNoField component as other checklist items",
+        "The field value is included in the generated PDF output",
+        "The default value is stored in defaults.ts and the type is defined in types.ts"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/checklist/types.ts",
+          "operation": "modify",
+          "description": "Add carbonMonoxideTest field to the safety/appliances section type definition to support the new yes/no checklist item"
+        },
+        {
+          "path": "frontend/src/lib/checklist/defaults.ts",
+          "operation": "modify",
+          "description": "Add carbonMonoxideTest with default value 'noAnswer' to the safety/appliances section in the default checklist structure"
+        },
+        {
+          "path": "frontend/src/pages/ChecklistFormPage.tsx",
+          "operation": "modify",
+          "description": "Add YesNoField for carbonMonoxideTest with label 'If there are any gas burning appliances, test for Carbon Monoxide.' in the safety/appliances section of the form, following the existing field pattern"
+        },
+        {
+          "path": "frontend/src/lib/pdf/generateChecklistPdf.ts",
+          "operation": "modify",
+          "description": "Include the carbonMonoxideTest field and its value in the PDF generation output for the safety/appliances section"
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Add 'When turning the water on, how long does it take for the hot water to arrive?' to the plumbing/water heater section",
+      "acceptanceCriteria": [
+        "The new question appears in the plumbing/water heater section of the checklist",
+        "The item uses an appropriate input field allowing free-text or numeric entry for duration",
+        "The field value is included in the generated PDF output",
+        "The default value is stored in defaults.ts and the type is defined in types.ts"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/checklist/types.ts",
+          "operation": "modify",
+          "description": "Add hotWaterArrivalTime field (string type) to the plumbing/water heater section type definition to support text/duration input"
+        },
+        {
+          "path": "frontend/src/lib/checklist/defaults.ts",
+          "operation": "modify",
+          "description": "Add hotWaterArrivalTime with default empty string value to the plumbing/water heater section in the default checklist structure"
+        },
+        {
+          "path": "frontend/src/pages/ChecklistFormPage.tsx",
+          "operation": "modify",
+          "description": "Add text input field for hotWaterArrivalTime with label 'When turning the water on, how long does it take for the hot water to arrive?' in the plumbing/water heater section of the form, following the existing text field pattern if present"
+        },
+        {
+          "path": "frontend/src/lib/pdf/generateChecklistPdf.ts",
+          "operation": "modify",
+          "description": "Include the hotWaterArrivalTime field and its value in the PDF generation output for the plumbing/water heater section"
+        }
+      ]
+    }
+  ]
+}

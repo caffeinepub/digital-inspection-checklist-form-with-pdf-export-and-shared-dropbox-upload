@@ -1,0 +1,79 @@
+{
+  "kind": "build_request",
+  "title": "Add three new inspection items to checklist",
+  "projectName": "Home Inspector Checklist",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Add a new checklist item 'Is the washer drain properly secured in the drain pipe?' to the plumbing/laundry section of the checklist form. This should follow the same YesNoField pattern used by other items in that section.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Is the washer drain properly secured in the drain pipe?"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The new question appears in the plumbing/laundry section of the checklist",
+        "The item uses the same YesNoField component as other checklist items",
+        "The field value is included in the generated PDF output",
+        "The default value is stored in defaults.ts and the type is defined in types.ts"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Add a new checklist item 'If there are any gas burning appliances, test for Carbon Monoxide.' to the safety/appliances section of the checklist form. This should follow the same YesNoField pattern used by other items in that section.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "If there are any gas burning appliances, test for Carbon Monoxide."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The new question appears in the safety/appliances section of the checklist",
+        "The item uses the same YesNoField component as other checklist items",
+        "The field value is included in the generated PDF output",
+        "The default value is stored in defaults.ts and the type is defined in types.ts"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Add a new checklist item 'When turning the water on, how long does it take for the hot water to arrive?' to the plumbing/water heater section of the checklist form. This item should use a text input field (not a yes/no field) to allow the inspector to enter a duration or description.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "When turning the water on, how long does it take for the hot water to arrive?"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The new question appears in the plumbing/water heater section of the checklist",
+        "The item uses an appropriate input field allowing free-text or numeric entry for duration",
+        "The field value is included in the generated PDF output",
+        "The default value is stored in defaults.ts and the type is defined in types.ts"
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not change the overall layout or structure of existing checklist sections",
+    "New items must follow the existing component patterns (YesNoField or equivalent text field)",
+    "All new fields must be reflected in types.ts, defaults.ts, and generateChecklistPdf.ts"
+  ],
+  "nonGoals": [
+    "Redesigning or restructuring existing checklist sections",
+    "Adding new sections beyond the three placement areas specified",
+    "Changing PDF upload or download logic"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

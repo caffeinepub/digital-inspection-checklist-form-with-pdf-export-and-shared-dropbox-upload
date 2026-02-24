@@ -1,0 +1,74 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-add-a-new-checklist-item-is-the-washer-drain-properly-secured-in-the-drain-pipe-to-the-plumbing-laundry-section-of-the-checklist-form-this-should-follow-the-same-yesnofield-pattern-used-by-other-items-in-that-section",
+      "featureTitle": "Add a new checklist item 'Is the washer drain properly secured in the drain pipe?' to the plumbing/laundry section of the checklist form. This should follow the same YesNoField pattern used by other items in that section.",
+      "files": [
+        "frontend/src/lib/checklist/defaults.ts",
+        "frontend/src/lib/checklist/types.ts",
+        "frontend/src/lib/pdf/generateChecklistPdf.ts",
+        "frontend/src/pages/ChecklistFormPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "http-outcalls@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-new-checklist-item-if-there-are-any-gas-burning-appliances-test-for-carbon-monoxide-to-the-safety-appliances-section-of-the-checklist-form-this-should-follow-the-same-yesnofield-pattern-used-by-other-items-in-that-section",
+      "featureTitle": "Add a new checklist item 'If there are any gas burning appliances, test for Carbon Monoxide.' to the safety/appliances section of the checklist form. This should follow the same YesNoField pattern used by other items in that section.",
+      "files": [
+        "frontend/src/lib/checklist/defaults.ts",
+        "frontend/src/lib/checklist/types.ts",
+        "frontend/src/lib/pdf/generateChecklistPdf.ts",
+        "frontend/src/pages/ChecklistFormPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "http-outcalls@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-new-checklist-item-when-turning-the-water-on-how-long-does-it-take-for-the-hot-water-to-arrive-to-the-plumbing-water-heater-section-of-the-checklist-form-this-item-should-use-a-text-input-field-not-a-yes-no-field-to-allow-the-inspector-to-enter-a-duration-or-description",
+      "featureTitle": "Add a new checklist item 'When turning the water on, how long does it take for the hot water to arrive?' to the plumbing/water heater section of the checklist form. This item should use a text input field (not a yes/no field) to allow the inspector to enter a duration or description.",
+      "files": [
+        "frontend/src/lib/checklist/defaults.ts",
+        "frontend/src/lib/checklist/types.ts",
+        "frontend/src/lib/pdf/generateChecklistPdf.ts",
+        "frontend/src/pages/ChecklistFormPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "http-outcalls@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    }
+  ]
+}
