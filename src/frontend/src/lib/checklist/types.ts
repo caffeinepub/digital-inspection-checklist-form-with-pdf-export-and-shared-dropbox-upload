@@ -2,8 +2,7 @@ export interface ChecklistFormData {
   roomNumber: string;
   inspector: string;
   date: string;
-  unitArea: string;
-  
+
   section1: {
     roomOdor: {
       checked: boolean;
@@ -12,11 +11,11 @@ export interface ChecklistFormData {
     thermostatCheck: {
       checked: boolean;
       setTemp: string;
-      matchesActual: 'yes' | 'no' | '';
+      matchesActual: "yes" | "no" | "";
     };
     scaleBuildup: boolean;
   };
-  
+
   section2: {
     lightSwitches: boolean;
     bulbs: {
@@ -26,26 +25,30 @@ export interface ChecklistFormData {
     outletSwitchCovers: boolean;
     gfciOutlets: boolean;
     noBurnMarks: boolean;
+    carbonMonoxideTest: "yes" | "no" | "";
   };
-  
+
   section3: {
     hotWaterFixtures: {
       checked: boolean;
       waterTemp: string;
     };
+    hotWaterArrivalTime: string;
     drainage: boolean;
     popUpAssembly: boolean;
     soapDispenser: boolean;
+    disposalCheck: boolean;
     toiletFlushTest: {
-      flushOperation: 'yes' | 'no' | '';
-      secureAtBase: 'yes' | 'no' | '';
-      rearCaulkLeakage: 'yes' | 'no' | '';
+      flushOperation: "yes" | "no" | "";
+      secureAtBase: "yes" | "no" | "";
+      rearCaulkLeakage: "yes" | "no" | "";
     };
-    toiletTankFreeOfCracks: 'yes' | 'no' | '';
+    toiletTankFreeOfCracks: "yes" | "no" | "";
     rearCaulkOpening: boolean;
     bathroomGFCI: boolean;
+    washerDrainSecured: "yes" | "no" | "";
   };
-  
+
   section4: {
     underSinksDry: boolean;
     floorsFirmDry: boolean;
@@ -56,15 +59,15 @@ export interface ChecklistFormData {
     mainShutOffValve: boolean;
     mainShutOffValveExercised: boolean;
   };
-  
+
   section5: {
     allFixturesOff: boolean;
     noWaterRunning: boolean;
     areaCleanOrderly: boolean;
   };
-  
+
   notesIssues: string;
-  
+
   workOrderGuidance: {
     createWorkOrder: boolean;
     doNotCreateWO: boolean;

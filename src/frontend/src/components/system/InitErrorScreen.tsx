@@ -1,14 +1,26 @@
-import { AlertCircle, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { AlertCircle, RefreshCw } from "lucide-react";
 
 interface InitErrorScreenProps {
   error?: Error | string;
   onRetry?: () => void;
 }
 
-export default function InitErrorScreen({ error, onRetry }: InitErrorScreenProps) {
-  const errorMessage = typeof error === 'string' ? error : error?.message || 'An unexpected error occurred';
+export default function InitErrorScreen({
+  error,
+  onRetry,
+}: InitErrorScreenProps) {
+  const errorMessage =
+    typeof error === "string"
+      ? error
+      : error?.message || "An unexpected error occurred";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -28,7 +40,7 @@ export default function InitErrorScreen({ error, onRetry }: InitErrorScreenProps
               {errorMessage}
             </p>
           </div>
-          
+
           <div className="space-y-2">
             <p className="text-sm font-medium">Try the following:</p>
             <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">

@@ -1,8 +1,8 @@
-import { ReactNode } from 'react';
-import { useIsCallerAdmin } from '../../hooks/useQueries';
-import { useInternetIdentity } from '../../hooks/useInternetIdentity';
-import AccessDeniedScreen from './AccessDeniedScreen';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from "lucide-react";
+import type { ReactNode } from "react";
+import { useInternetIdentity } from "../../hooks/useInternetIdentity";
+import { useIsCallerAdmin } from "../../hooks/useQueries";
+import AccessDeniedScreen from "./AccessDeniedScreen";
 
 interface RequireAdminProps {
   children: ReactNode;
@@ -25,7 +25,9 @@ export default function RequireAdmin({ children }: RequireAdminProps) {
   }
 
   if (!isAdmin) {
-    return <AccessDeniedScreen message="You do not have permission to access this page" />;
+    return (
+      <AccessDeniedScreen message="You do not have permission to access this page" />
+    );
   }
 
   return <>{children}</>;

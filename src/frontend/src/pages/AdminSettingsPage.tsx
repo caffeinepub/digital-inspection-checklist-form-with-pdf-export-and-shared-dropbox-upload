@@ -1,42 +1,61 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Save, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { toast } from 'sonner';
-import { useGetDropboxToken, useSetDropboxToken } from '../hooks/useQueries';
-import RequireAdmin from '../components/auth/RequireAdmin';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  Loader2,
+  Save,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import RequireAdmin from "../components/auth/RequireAdmin";
+import { useGetDropboxToken, useSetDropboxToken } from "../hooks/useQueries";
 
 function AdminSettingsContent() {
-  const { data: existingToken, isLoading: tokenLoading, refetch } = useGetDropboxToken();
+  const {
+    data: existingToken,
+    isLoading: tokenLoading,
+    refetch,
+  } = useGetDropboxToken();
   const { mutate: setToken, isPending: isSaving } = useSetDropboxToken();
-  const [tokenInput, setTokenInput] = useState('');
+  const [tokenInput, setTokenInput] = useState("");
   const [showToken, setShowToken] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">(
+    "idle",
+  );
 
   const isTokenSet = !!existingToken;
 
   const handleSave = () => {
     if (!tokenInput.trim()) {
-      toast.error('Please enter a Dropbox access token');
+      toast.error("Please enter a Dropbox access token");
       return;
     }
 
-    setSaveStatus('idle');
+    setSaveStatus("idle");
     setToken(tokenInput, {
       onSuccess: async () => {
-        setSaveStatus('success');
-        setTokenInput('');
+        setSaveStatus("success");
+        setTokenInput("");
         setShowToken(false);
         await refetch();
-        toast.success('Dropbox token saved successfully');
+        toast.success("Dropbox token saved successfully");
       },
       onError: (error) => {
-        setSaveStatus('error');
-        toast.error('Failed to save Dropbox token');
-        console.error('Save error:', error);
+        setSaveStatus("error");
+        toast.error("Failed to save Dropbox token");
+        console.error("Save error:", error);
       },
     });
   };
@@ -61,17 +80,27 @@ function AdminSettingsContent() {
 
         <CardContent className="pt-6 space-y-6">
           {/* Current Status */}
-          <Alert className={isTokenSet ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950' : ''}>
+          <Alert
+            className={
+              isTokenSet
+                ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950"
+                : ""
+            }
+          >
             <AlertDescription className="flex items-center gap-2">
               {isTokenSet ? (
                 <>
                   <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                  <span className="font-medium">Dropbox token is configured</span>
+                  <span className="font-medium">
+                    Dropbox token is configured
+                  </span>
                 </>
               ) : (
                 <>
                   <AlertCircle className="h-4 w-4 text-amber-600" />
-                  <span className="font-medium">No Dropbox token configured</span>
+                  <span className="font-medium">
+                    No Dropbox token configured
+                  </span>
                 </>
               )}
             </AlertDescription>
@@ -84,14 +113,15 @@ function AdminSettingsContent() {
                 Dropbox Access Token
               </Label>
               <p className="text-sm text-muted-foreground">
-                Enter your Dropbox access token to enable automatic PDF uploads to your shared Dropbox account.
+                Enter your Dropbox access token to enable automatic PDF uploads
+                to your shared Dropbox account.
               </p>
             </div>
 
             <div className="relative">
               <Input
                 id="dropboxToken"
-                type={showToken ? 'text' : 'password'}
+                type={showToken ? "text" : "password"}
                 value={tokenInput}
                 onChange={(e) => setTokenInput(e.target.value)}
                 placeholder="Enter Dropbox access token"
@@ -131,16 +161,17 @@ function AdminSettingsContent() {
               )}
             </Button>
 
-            {saveStatus === 'success' && (
+            {saveStatus === "success" && (
               <Alert className="border-emerald-500 bg-emerald-50 dark:bg-emerald-950">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                 <AlertDescription className="text-emerald-800 dark:text-emerald-200">
-                  Token saved successfully. PDF uploads will now be sent to Dropbox.
+                  Token saved successfully. PDF uploads will now be sent to
+                  Dropbox.
                 </AlertDescription>
               </Alert>
             )}
 
-            {saveStatus === 'error' && (
+            {saveStatus === "error" && (
               <Alert className="border-destructive bg-destructive/10">
                 <AlertCircle className="h-4 w-4 text-destructive" />
                 <AlertDescription className="text-destructive">
@@ -152,7 +183,9 @@ function AdminSettingsContent() {
 
           {/* Instructions */}
           <div className="space-y-2 pt-4 border-t">
-            <h3 className="font-semibold text-sm">How to get a Dropbox access token:</h3>
+            <h3 className="font-semibold text-sm">
+              How to get a Dropbox access token:
+            </h3>
             <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
               <li>Go to the Dropbox App Console</li>
               <li>Create a new app or select an existing one</li>

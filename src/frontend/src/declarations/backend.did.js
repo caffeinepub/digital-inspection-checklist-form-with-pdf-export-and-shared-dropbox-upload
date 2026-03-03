@@ -27,6 +27,39 @@ export const MetadataAndPdf = IDL.Record({
   'pdf' : PdfBinary,
   'metadata' : PdfMetadata,
 });
+export const FieldValue = IDL.Variant({
+  'no' : IDL.Null,
+  'yes' : IDL.Null,
+  'noAnswer' : IDL.Null,
+  'notAppicable' : IDL.Null,
+  'text' : IDL.Text,
+  'notTested' : IDL.Null,
+});
+export const BinaryField = IDL.Record({
+  'id' : IDL.Text,
+  'value' : FieldValue,
+  'description' : IDL.Text,
+});
+export const YesNoField = IDL.Record({
+  'id' : IDL.Text,
+  'value' : FieldValue,
+  'description' : IDL.Text,
+});
+export const TextField = IDL.Record({
+  'id' : IDL.Text,
+  'value' : FieldValue,
+  'description' : IDL.Text,
+});
+export const ChecklistSection = IDL.Record({
+  'id' : IDL.Text,
+  'description' : IDL.Text,
+  'binaryFields' : IDL.Vec(BinaryField),
+  'yesNoFields' : IDL.Vec(YesNoField),
+  'textFields' : IDL.Vec(TextField),
+});
+export const RoomChecklist = IDL.Record({
+  'checklistSections' : IDL.Vec(ChecklistSection),
+});
 export const UploadResult = IDL.Variant({
   'error' : IDL.Text,
   'success' : IDL.Text,
@@ -42,6 +75,7 @@ export const idlService = IDL.Service({
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getDropboxToken' : IDL.Func([], [IDL.Opt(DropboxToken)], ['query']),
   'getPdf' : IDL.Func([Room], [MetadataAndPdf], ['query']),
+  'getRoomChecklist' : IDL.Func([Room], [IDL.Opt(RoomChecklist)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -49,6 +83,7 @@ export const idlService = IDL.Service({
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'saveRoomChecklist' : IDL.Func([Room, RoomChecklist], [UploadResult], []),
   'setDropboxToken' : IDL.Func([DropboxToken], [], []),
   'uploadPdf' : IDL.Func([Room, PdfBinary, IDL.Nat64], [UploadResult], []),
 });
@@ -75,6 +110,39 @@ export const idlFactory = ({ IDL }) => {
     'pdf' : PdfBinary,
     'metadata' : PdfMetadata,
   });
+  const FieldValue = IDL.Variant({
+    'no' : IDL.Null,
+    'yes' : IDL.Null,
+    'noAnswer' : IDL.Null,
+    'notAppicable' : IDL.Null,
+    'text' : IDL.Text,
+    'notTested' : IDL.Null,
+  });
+  const BinaryField = IDL.Record({
+    'id' : IDL.Text,
+    'value' : FieldValue,
+    'description' : IDL.Text,
+  });
+  const YesNoField = IDL.Record({
+    'id' : IDL.Text,
+    'value' : FieldValue,
+    'description' : IDL.Text,
+  });
+  const TextField = IDL.Record({
+    'id' : IDL.Text,
+    'value' : FieldValue,
+    'description' : IDL.Text,
+  });
+  const ChecklistSection = IDL.Record({
+    'id' : IDL.Text,
+    'description' : IDL.Text,
+    'binaryFields' : IDL.Vec(BinaryField),
+    'yesNoFields' : IDL.Vec(YesNoField),
+    'textFields' : IDL.Vec(TextField),
+  });
+  const RoomChecklist = IDL.Record({
+    'checklistSections' : IDL.Vec(ChecklistSection),
+  });
   const UploadResult = IDL.Variant({
     'error' : IDL.Text,
     'success' : IDL.Text,
@@ -90,6 +158,7 @@ export const idlFactory = ({ IDL }) => {
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getDropboxToken' : IDL.Func([], [IDL.Opt(DropboxToken)], ['query']),
     'getPdf' : IDL.Func([Room], [MetadataAndPdf], ['query']),
+    'getRoomChecklist' : IDL.Func([Room], [IDL.Opt(RoomChecklist)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
@@ -97,6 +166,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'saveRoomChecklist' : IDL.Func([Room, RoomChecklist], [UploadResult], []),
     'setDropboxToken' : IDL.Func([DropboxToken], [], []),
     'uploadPdf' : IDL.Func([Room, PdfBinary, IDL.Nat64], [UploadResult], []),
   });

@@ -1,16 +1,25 @@
-import { createRouter, RouterProvider, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
-import { useInternetIdentity } from './hooks/useInternetIdentity';
-import { useGetCallerUserProfile, useSaveCallerUserProfile } from './hooks/useQueries';
-import { useActor } from './hooks/useActor';
-import ChecklistFormPage from './pages/ChecklistFormPage';
-import AdminSettingsPage from './pages/AdminSettingsPage';
-import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
-import ProfileSetupModal from './components/auth/ProfileSetupModal';
-import InitErrorScreen from './components/system/InitErrorScreen';
-import { Toaster } from '@/components/ui/sonner';
-import { ThemeProvider } from 'next-themes';
-import { Loader2 } from 'lucide-react';
+import { Toaster } from "@/components/ui/sonner";
+import {
+  Outlet,
+  RouterProvider,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
+import { ThemeProvider } from "next-themes";
+import ProfileSetupModal from "./components/auth/ProfileSetupModal";
+import Footer from "./components/layout/Footer";
+import Header from "./components/layout/Header";
+import InitErrorScreen from "./components/system/InitErrorScreen";
+import { useActor } from "./hooks/useActor";
+import { useInternetIdentity } from "./hooks/useInternetIdentity";
+import {
+  useGetCallerUserProfile,
+  useSaveCallerUserProfile,
+} from "./hooks/useQueries";
+import AdminSettingsPage from "./pages/AdminSettingsPage";
+import ChecklistFormPage from "./pages/ChecklistFormPage";
 
 function Layout() {
   return (
@@ -30,13 +39,13 @@ const rootRoute = createRootRoute({
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
+  path: "/",
   component: ChecklistFormPage,
 });
 
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/admin',
+  path: "/admin",
   component: AdminSettingsPage,
 });
 
@@ -44,7 +53,7 @@ const routeTree = rootRoute.addChildren([indexRoute, adminRoute]);
 
 const router = createRouter({ routeTree });
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
   }
@@ -53,11 +62,16 @@ declare module '@tanstack/react-router' {
 function AppContent() {
   const { identity } = useInternetIdentity();
   const { actor, isFetching: actorFetching } = useActor();
-  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
+  const {
+    data: userProfile,
+    isLoading: profileLoading,
+    isFetched,
+  } = useGetCallerUserProfile();
   const { mutate: saveProfile } = useSaveCallerUserProfile();
 
   const isAuthenticated = !!identity;
-  const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
+  const showProfileSetup =
+    isAuthenticated && !profileLoading && isFetched && userProfile === null;
 
   const handleProfileSave = (name: string) => {
     saveProfile({ name });
@@ -77,16 +91,15 @@ function AppContent() {
 
   // If actor failed to initialize, show error
   if (!actor && !actorFetching) {
-    return <InitErrorScreen error="Failed to initialize application. Please refresh the page." />;
+    return (
+      <InitErrorScreen error="Failed to initialize application. Please refresh the page." />
+    );
   }
 
   return (
     <>
       <RouterProvider router={router} />
-      <ProfileSetupModal
-        open={showProfileSetup}
-        onSave={handleProfileSave}
-      />
+      <ProfileSetupModal open={showProfileSetup} onSave={handleProfileSave} />
       <Toaster />
     </>
   );
@@ -94,7 +107,12 @@ function AppContent() {
 
 function App() {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="light"
+      enableSystem
+      storageKey="safety-inspection-theme"
+    >
       <AppContent />
     </ThemeProvider>
   );

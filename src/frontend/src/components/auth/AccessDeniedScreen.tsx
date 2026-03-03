@@ -1,14 +1,20 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ShieldAlert } from 'lucide-react';
-import { useNavigate } from '@tanstack/react-router';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useNavigate } from "@tanstack/react-router";
+import { ShieldAlert } from "lucide-react";
 
 interface AccessDeniedScreenProps {
   message?: string;
 }
 
-export default function AccessDeniedScreen({ 
-  message = 'You do not have access to this page' 
+export default function AccessDeniedScreen({
+  message = "You do not have access to this page",
 }: AccessDeniedScreenProps) {
   const navigate = useNavigate();
 
@@ -23,9 +29,7 @@ export default function AccessDeniedScreen({
           <CardDescription className="text-base">{message}</CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center">
-          <Button onClick={() => navigate({ to: '/' })}>
-            Return to Home
-          </Button>
+          <Button onClick={() => navigate({ to: "/" })}>Return to Home</Button>
         </CardContent>
       </Card>
     </div>

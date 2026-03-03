@@ -1,14 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { UserProfile, UserRole, DropboxToken } from '../backend';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { DropboxToken, UserProfile, UserRole } from "../backend";
+import { useActor } from "./useActor";
 
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
 
   const query = useQuery<UserProfile | null>({
-    queryKey: ['currentUserProfile'],
+    queryKey: ["currentUserProfile"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getCallerUserProfile();
     },
     enabled: !!actor && !actorFetching,
@@ -28,11 +28,11 @@ export function useSaveCallerUserProfile() {
 
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ["currentUserProfile"] });
     },
   });
 }
@@ -41,9 +41,9 @@ export function useGetCallerUserRole() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<UserRole>({
-    queryKey: ['currentUserRole'],
+    queryKey: ["currentUserRole"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getCallerUserRole();
     },
     enabled: !!actor && !actorFetching,
@@ -55,9 +55,9 @@ export function useIsCallerAdmin() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<boolean>({
-    queryKey: ['isAdmin'],
+    queryKey: ["isAdmin"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.isCallerAdmin();
     },
     enabled: !!actor && !actorFetching,
@@ -69,9 +69,9 @@ export function useAreAdminPrivilegesAvailable() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<boolean>({
-    queryKey: ['adminPrivilegesAvailable'],
+    queryKey: ["adminPrivilegesAvailable"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.areAdminPrivilegesAvailable();
     },
     enabled: !!actor && !actorFetching,
@@ -85,13 +85,13 @@ export function useClaimAdminPrivileges() {
 
   return useMutation({
     mutationFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.claimAdminPrivileges();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['isAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['adminPrivilegesAvailable'] });
-      queryClient.invalidateQueries({ queryKey: ['currentUserRole'] });
+      queryClient.invalidateQueries({ queryKey: ["isAdmin"] });
+      queryClient.invalidateQueries({ queryKey: ["adminPrivilegesAvailable"] });
+      queryClient.invalidateQueries({ queryKey: ["currentUserRole"] });
     },
   });
 }
@@ -100,9 +100,9 @@ export function useGetDropboxToken() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<DropboxToken | null>({
-    queryKey: ['dropboxToken'],
+    queryKey: ["dropboxToken"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getDropboxToken();
     },
     enabled: !!actor && !actorFetching,
@@ -116,18 +116,18 @@ export function useSetDropboxToken() {
 
   return useMutation({
     mutationFn: async (token: DropboxToken) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.setDropboxToken(token);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dropboxToken'] });
+      queryClient.invalidateQueries({ queryKey: ["dropboxToken"] });
     },
   });
 }
 
 export function useDropboxConfiguration() {
   const { data: token, isLoading } = useGetDropboxToken();
-  
+
   return {
     isConfigured: !!token,
     isLoading,

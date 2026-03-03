@@ -1,6 +1,12 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { ReactNode } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import type { ReactNode } from "react";
 
 interface ChecklistSectionProps {
   title: string;
@@ -8,7 +14,11 @@ interface ChecklistSectionProps {
   children: ReactNode;
 }
 
-export default function ChecklistSection({ title, description, children }: ChecklistSectionProps) {
+export default function ChecklistSection({
+  title,
+  description,
+  children,
+}: ChecklistSectionProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-1">
@@ -18,9 +28,7 @@ export default function ChecklistSection({ title, description, children }: Check
         )}
       </div>
       <Separator />
-      <div className="pl-2">
-        {children}
-      </div>
+      <div className="pl-2">{children}</div>
     </div>
   );
 }

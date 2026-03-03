@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,18 +6,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
 
 interface ProfileSetupModalProps {
   open: boolean;
   onSave: (name: string) => void;
 }
 
-export default function ProfileSetupModal({ open, onSave }: ProfileSetupModalProps) {
-  const [name, setName] = useState('');
+export default function ProfileSetupModal({
+  open,
+  onSave,
+}: ProfileSetupModalProps) {
+  const [name, setName] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +31,10 @@ export default function ProfileSetupModal({ open, onSave }: ProfileSetupModalPro
 
   return (
     <Dialog open={open}>
-      <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()}>
+      <DialogContent
+        className="sm:max-w-md"
+        onPointerDownOutside={(e) => e.preventDefault()}
+      >
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Welcome!</DialogTitle>

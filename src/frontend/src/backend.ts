@@ -89,24 +89,37 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface MetadataAndPdf {
-    pdf: PdfBinary;
-    metadata: PdfMetadata;
-}
 export type PdfBinary = Uint8Array;
+export interface ChecklistSection {
+    id: string;
+    description: string;
+    binaryFields: Array<BinaryField>;
+    yesNoFields: Array<YesNoField>;
+    textFields: Array<TextField>;
+}
 export interface PdfMetadata {
     uploadTimestamp: bigint;
 }
-export type DropboxToken = string;
+export type FieldValue = {
+    __kind__: "no";
+    no: null;
+} | {
+    __kind__: "yes";
+    yes: null;
+} | {
+    __kind__: "noAnswer";
+    noAnswer: null;
+} | {
+    __kind__: "notAppicable";
+    notAppicable: null;
+} | {
+    __kind__: "text";
+    text: string;
+} | {
+    __kind__: "notTested";
+    notTested: null;
+};
 export type Room = string;
-export interface PdfEntry {
-    pdf: PdfBinary;
-    metadata: PdfMetadata;
-    room: Room;
-}
-export interface UserProfile {
-    name: string;
-}
 export type UploadResult = {
     __kind__: "error";
     error: string;
@@ -114,6 +127,37 @@ export type UploadResult = {
     __kind__: "success";
     success: string;
 };
+export interface YesNoField {
+    id: string;
+    value: FieldValue;
+    description: string;
+}
+export interface RoomChecklist {
+    checklistSections: Array<ChecklistSection>;
+}
+export type DropboxToken = string;
+export interface PdfEntry {
+    pdf: PdfBinary;
+    metadata: PdfMetadata;
+    room: Room;
+}
+export interface BinaryField {
+    id: string;
+    value: FieldValue;
+    description: string;
+}
+export interface TextField {
+    id: string;
+    value: FieldValue;
+    description: string;
+}
+export interface MetadataAndPdf {
+    pdf: PdfBinary;
+    metadata: PdfMetadata;
+}
+export interface UserProfile {
+    name: string;
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -129,13 +173,15 @@ export interface backendInterface {
     getCallerUserRole(): Promise<UserRole>;
     getDropboxToken(): Promise<DropboxToken | null>;
     getPdf(room: Room): Promise<MetadataAndPdf>;
+    getRoomChecklist(room: Room): Promise<RoomChecklist | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    saveRoomChecklist(_room: Room, _checklist: RoomChecklist): Promise<UploadResult>;
     setDropboxToken(token: DropboxToken): Promise<void>;
     uploadPdf(_room: Room, _pdf: PdfBinary, _timestamp: bigint): Promise<UploadResult>;
 }
-import type { DropboxToken as _DropboxToken, UploadResult as _UploadResult, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { BinaryField as _BinaryField, ChecklistSection as _ChecklistSection, DropboxToken as _DropboxToken, FieldValue as _FieldValue, RoomChecklist as _RoomChecklist, TextField as _TextField, UploadResult as _UploadResult, UserProfile as _UserProfile, UserRole as _UserRole, YesNoField as _YesNoField } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -264,6 +310,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getRoomChecklist(arg0: Room): Promise<RoomChecklist | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getRoomChecklist(arg0);
+                return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getRoomChecklist(arg0);
+            return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
@@ -306,6 +366,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async saveRoomChecklist(arg0: Room, arg1: RoomChecklist): Promise<UploadResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.saveRoomChecklist(arg0, to_candid_RoomChecklist_n22(this._uploadFile, this._downloadFile, arg1));
+                return from_candid_UploadResult_n36(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.saveRoomChecklist(arg0, to_candid_RoomChecklist_n22(this._uploadFile, this._downloadFile, arg1));
+            return from_candid_UploadResult_n36(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async setDropboxToken(arg0: DropboxToken): Promise<void> {
         if (this.processError) {
             try {
@@ -324,22 +398,40 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.uploadPdf(arg0, arg1, arg2);
-                return from_candid_UploadResult_n7(this._uploadFile, this._downloadFile, result);
+                return from_candid_UploadResult_n36(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.uploadPdf(arg0, arg1, arg2);
-            return from_candid_UploadResult_n7(this._uploadFile, this._downloadFile, result);
+            return from_candid_UploadResult_n36(this._uploadFile, this._downloadFile, result);
         }
     }
 }
-function from_candid_UploadResult_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UploadResult): UploadResult {
-    return from_candid_variant_n8(_uploadFile, _downloadFile, value);
+function from_candid_BinaryField_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _BinaryField): BinaryField {
+    return from_candid_record_n15(_uploadFile, _downloadFile, value);
+}
+function from_candid_ChecklistSection_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ChecklistSection): ChecklistSection {
+    return from_candid_record_n12(_uploadFile, _downloadFile, value);
+}
+function from_candid_FieldValue_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _FieldValue): FieldValue {
+    return from_candid_variant_n17(_uploadFile, _downloadFile, value);
+}
+function from_candid_RoomChecklist_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _RoomChecklist): RoomChecklist {
+    return from_candid_record_n9(_uploadFile, _downloadFile, value);
+}
+function from_candid_TextField_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _TextField): TextField {
+    return from_candid_record_n15(_uploadFile, _downloadFile, value);
+}
+function from_candid_UploadResult_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UploadResult): UploadResult {
+    return from_candid_variant_n37(_uploadFile, _downloadFile, value);
 }
 function from_candid_UserRole_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
     return from_candid_variant_n5(_uploadFile, _downloadFile, value);
+}
+function from_candid_YesNoField_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _YesNoField): YesNoField {
+    return from_candid_record_n15(_uploadFile, _downloadFile, value);
 }
 function from_candid_opt_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
     return value.length === 0 ? null : value[0];
@@ -347,16 +439,106 @@ function from_candid_opt_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Ar
 function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_DropboxToken]): DropboxToken | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
-    admin: null;
-} | {
-    user: null;
-} | {
-    guest: null;
-}): UserRole {
-    return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
+function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_RoomChecklist]): RoomChecklist | null {
+    return value.length === 0 ? null : from_candid_RoomChecklist_n8(_uploadFile, _downloadFile, value[0]);
 }
-function from_candid_variant_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    description: string;
+    binaryFields: Array<_BinaryField>;
+    yesNoFields: Array<_YesNoField>;
+    textFields: Array<_TextField>;
+}): {
+    id: string;
+    description: string;
+    binaryFields: Array<BinaryField>;
+    yesNoFields: Array<YesNoField>;
+    textFields: Array<TextField>;
+} {
+    return {
+        id: value.id,
+        description: value.description,
+        binaryFields: from_candid_vec_n13(_uploadFile, _downloadFile, value.binaryFields),
+        yesNoFields: from_candid_vec_n18(_uploadFile, _downloadFile, value.yesNoFields),
+        textFields: from_candid_vec_n20(_uploadFile, _downloadFile, value.textFields)
+    };
+}
+function from_candid_record_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    value: _FieldValue;
+    description: string;
+}): {
+    id: string;
+    value: FieldValue;
+    description: string;
+} {
+    return {
+        id: value.id,
+        value: from_candid_FieldValue_n16(_uploadFile, _downloadFile, value.value),
+        description: value.description
+    };
+}
+function from_candid_record_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    checklistSections: Array<_ChecklistSection>;
+}): {
+    checklistSections: Array<ChecklistSection>;
+} {
+    return {
+        checklistSections: from_candid_vec_n10(_uploadFile, _downloadFile, value.checklistSections)
+    };
+}
+function from_candid_variant_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    no: null;
+} | {
+    yes: null;
+} | {
+    noAnswer: null;
+} | {
+    notAppicable: null;
+} | {
+    text: string;
+} | {
+    notTested: null;
+}): {
+    __kind__: "no";
+    no: null;
+} | {
+    __kind__: "yes";
+    yes: null;
+} | {
+    __kind__: "noAnswer";
+    noAnswer: null;
+} | {
+    __kind__: "notAppicable";
+    notAppicable: null;
+} | {
+    __kind__: "text";
+    text: string;
+} | {
+    __kind__: "notTested";
+    notTested: null;
+} {
+    return "no" in value ? {
+        __kind__: "no",
+        no: value.no
+    } : "yes" in value ? {
+        __kind__: "yes",
+        yes: value.yes
+    } : "noAnswer" in value ? {
+        __kind__: "noAnswer",
+        noAnswer: value.noAnswer
+    } : "notAppicable" in value ? {
+        __kind__: "notAppicable",
+        notAppicable: value.notAppicable
+    } : "text" in value ? {
+        __kind__: "text",
+        text: value.text
+    } : "notTested" in value ? {
+        __kind__: "notTested",
+        notTested: value.notTested
+    } : value;
+}
+function from_candid_variant_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     error: string;
 } | {
     success: string;
@@ -375,8 +557,92 @@ function from_candid_variant_n8(_uploadFile: (file: ExternalBlob) => Promise<Uin
         success: value.success
     } : value;
 }
+function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    admin: null;
+} | {
+    user: null;
+} | {
+    guest: null;
+}): UserRole {
+    return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
+}
+function from_candid_vec_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_ChecklistSection>): Array<ChecklistSection> {
+    return value.map((x)=>from_candid_ChecklistSection_n11(_uploadFile, _downloadFile, x));
+}
+function from_candid_vec_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_BinaryField>): Array<BinaryField> {
+    return value.map((x)=>from_candid_BinaryField_n14(_uploadFile, _downloadFile, x));
+}
+function from_candid_vec_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_YesNoField>): Array<YesNoField> {
+    return value.map((x)=>from_candid_YesNoField_n19(_uploadFile, _downloadFile, x));
+}
+function from_candid_vec_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_TextField>): Array<TextField> {
+    return value.map((x)=>from_candid_TextField_n21(_uploadFile, _downloadFile, x));
+}
+function to_candid_BinaryField_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BinaryField): _BinaryField {
+    return to_candid_record_n29(_uploadFile, _downloadFile, value);
+}
+function to_candid_ChecklistSection_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ChecklistSection): _ChecklistSection {
+    return to_candid_record_n26(_uploadFile, _downloadFile, value);
+}
+function to_candid_FieldValue_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: FieldValue): _FieldValue {
+    return to_candid_variant_n31(_uploadFile, _downloadFile, value);
+}
+function to_candid_RoomChecklist_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: RoomChecklist): _RoomChecklist {
+    return to_candid_record_n23(_uploadFile, _downloadFile, value);
+}
+function to_candid_TextField_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TextField): _TextField {
+    return to_candid_record_n29(_uploadFile, _downloadFile, value);
+}
 function to_candid_UserRole_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n2(_uploadFile, _downloadFile, value);
+}
+function to_candid_YesNoField_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: YesNoField): _YesNoField {
+    return to_candid_record_n29(_uploadFile, _downloadFile, value);
+}
+function to_candid_record_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    checklistSections: Array<ChecklistSection>;
+}): {
+    checklistSections: Array<_ChecklistSection>;
+} {
+    return {
+        checklistSections: to_candid_vec_n24(_uploadFile, _downloadFile, value.checklistSections)
+    };
+}
+function to_candid_record_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    description: string;
+    binaryFields: Array<BinaryField>;
+    yesNoFields: Array<YesNoField>;
+    textFields: Array<TextField>;
+}): {
+    id: string;
+    description: string;
+    binaryFields: Array<_BinaryField>;
+    yesNoFields: Array<_YesNoField>;
+    textFields: Array<_TextField>;
+} {
+    return {
+        id: value.id,
+        description: value.description,
+        binaryFields: to_candid_vec_n27(_uploadFile, _downloadFile, value.binaryFields),
+        yesNoFields: to_candid_vec_n32(_uploadFile, _downloadFile, value.yesNoFields),
+        textFields: to_candid_vec_n34(_uploadFile, _downloadFile, value.textFields)
+    };
+}
+function to_candid_record_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: string;
+    value: FieldValue;
+    description: string;
+}): {
+    id: string;
+    value: _FieldValue;
+    description: string;
+} {
+    return {
+        id: value.id,
+        value: to_candid_FieldValue_n30(_uploadFile, _downloadFile, value.value),
+        description: value.description
+    };
 }
 function to_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
     admin: null;
@@ -392,6 +658,63 @@ function to_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8
     } : value == UserRole.guest ? {
         guest: null
     } : value;
+}
+function to_candid_variant_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    __kind__: "no";
+    no: null;
+} | {
+    __kind__: "yes";
+    yes: null;
+} | {
+    __kind__: "noAnswer";
+    noAnswer: null;
+} | {
+    __kind__: "notAppicable";
+    notAppicable: null;
+} | {
+    __kind__: "text";
+    text: string;
+} | {
+    __kind__: "notTested";
+    notTested: null;
+}): {
+    no: null;
+} | {
+    yes: null;
+} | {
+    noAnswer: null;
+} | {
+    notAppicable: null;
+} | {
+    text: string;
+} | {
+    notTested: null;
+} {
+    return value.__kind__ === "no" ? {
+        no: value.no
+    } : value.__kind__ === "yes" ? {
+        yes: value.yes
+    } : value.__kind__ === "noAnswer" ? {
+        noAnswer: value.noAnswer
+    } : value.__kind__ === "notAppicable" ? {
+        notAppicable: value.notAppicable
+    } : value.__kind__ === "text" ? {
+        text: value.text
+    } : value.__kind__ === "notTested" ? {
+        notTested: value.notTested
+    } : value;
+}
+function to_candid_vec_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<ChecklistSection>): Array<_ChecklistSection> {
+    return value.map((x)=>to_candid_ChecklistSection_n25(_uploadFile, _downloadFile, x));
+}
+function to_candid_vec_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<BinaryField>): Array<_BinaryField> {
+    return value.map((x)=>to_candid_BinaryField_n28(_uploadFile, _downloadFile, x));
+}
+function to_candid_vec_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<YesNoField>): Array<_YesNoField> {
+    return value.map((x)=>to_candid_YesNoField_n33(_uploadFile, _downloadFile, x));
+}
+function to_candid_vec_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<TextField>): Array<_TextField> {
+    return value.map((x)=>to_candid_TextField_n35(_uploadFile, _downloadFile, x));
 }
 export interface CreateActorOptions {
     agent?: Agent;

@@ -1,54 +1,57 @@
-import type { ChecklistFormData } from './types';
+import type { ChecklistFormData } from "./types";
 
 export function getDefaultChecklistData(): ChecklistFormData {
   return {
-    roomNumber: '',
-    inspector: '',
-    date: new Date().toISOString().split('T')[0],
-    unitArea: '',
-    
+    roomNumber: "",
+    inspector: "",
+    date: new Date().toISOString().split("T")[0],
+
     section1: {
       roomOdor: {
         checked: false,
-        observation: '',
+        observation: "",
       },
       thermostatCheck: {
         checked: false,
-        setTemp: '',
-        matchesActual: '',
+        setTemp: "",
+        matchesActual: "",
       },
       scaleBuildup: false,
     },
-    
+
     section2: {
       lightSwitches: false,
       bulbs: {
         checked: false,
-        notes: '',
+        notes: "",
       },
       outletSwitchCovers: false,
       gfciOutlets: false,
       noBurnMarks: false,
+      carbonMonoxideTest: "",
     },
-    
+
     section3: {
       hotWaterFixtures: {
         checked: false,
-        waterTemp: '',
+        waterTemp: "",
       },
+      hotWaterArrivalTime: "",
       drainage: false,
       popUpAssembly: false,
       soapDispenser: false,
+      disposalCheck: false,
       toiletFlushTest: {
-        flushOperation: '',
-        secureAtBase: '',
-        rearCaulkLeakage: '',
+        flushOperation: "",
+        secureAtBase: "",
+        rearCaulkLeakage: "",
       },
-      toiletTankFreeOfCracks: '',
+      toiletTankFreeOfCracks: "",
       rearCaulkOpening: false,
       bathroomGFCI: false,
+      washerDrainSecured: "",
     },
-    
+
     section4: {
       underSinksDry: false,
       floorsFirmDry: false,
@@ -59,15 +62,15 @@ export function getDefaultChecklistData(): ChecklistFormData {
       mainShutOffValve: false,
       mainShutOffValveExercised: false,
     },
-    
+
     section5: {
       allFixturesOff: false,
       noWaterRunning: false,
       areaCleanOrderly: false,
     },
-    
-    notesIssues: '',
-    
+
+    notesIssues: "",
+
     workOrderGuidance: {
       createWorkOrder: false,
       doNotCreateWO: false,

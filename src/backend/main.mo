@@ -8,14 +8,12 @@ import Runtime "mo:core/Runtime";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 
-
-
 actor {
   // Data type definitions
   public type Room = Text;
   public type PdfBinary = Blob;
   public type UploadResult = { #success : Text; #error : Text };
-  public type DropboxToken = Text; // Store as text - will be Base64 encoded when sent to Dropbox API
+  public type DropboxToken = Text;
 
   public type PdfMetadata = { uploadTimestamp : Nat64 };
   public type MetadataAndPdf = {
@@ -26,6 +24,46 @@ actor {
     room : Room;
     metadata : PdfMetadata;
     pdf : PdfBinary;
+  };
+
+  // Checklist types
+  public type FieldValue = {
+    #yes;
+    #no;
+    #notAppicable;
+    #notTested;
+    #noAnswer;
+    #text : Text;
+  };
+
+  public type YesNoField = {
+    id : Text;
+    description : Text;
+    value : FieldValue;
+  };
+
+  public type TextField = {
+    id : Text;
+    description : Text;
+    value : FieldValue;
+  };
+
+  public type BinaryField = {
+    id : Text;
+    description : Text;
+    value : FieldValue;
+  };
+
+  public type ChecklistSection = {
+    id : Text;
+    description : Text;
+    yesNoFields : [YesNoField];
+    textFields : [TextField];
+    binaryFields : [BinaryField];
+  };
+
+  public type RoomChecklist = {
+    checklistSections : [ChecklistSection];
   };
 
   public type UserProfile = {
@@ -40,14 +78,25 @@ actor {
 
   // Storage
   let pdfs = Map.empty<Room, MetadataAndPdf>();
+  let checklists = Map.empty<Room, RoomChecklist>();
   let userProfiles = Map.empty<Principal, UserProfile>();
+
+  var dropboxToken : ?DropboxToken = null;
+
+  // Checklist management (persistent version)
+  public query ({ caller }) func getRoomChecklist(room : Room) : async ?RoomChecklist {
+    checklists.get(room);
+  };
+
+  public shared ({ caller }) func saveRoomChecklist(_room : Room, _checklist : RoomChecklist) : async UploadResult {
+    // should only be done by admin or future delegator/operator feature
+    Runtime.trap("Checklist should be updated only from the web. You should not save the persisted version.");
+  };
 
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  var dropboxToken : ?DropboxToken = null;
-
-  // Added admin claim tracking
+  // Admin claim tracking
   var adminsClaimed : Bool = false;
 
   // User profile management

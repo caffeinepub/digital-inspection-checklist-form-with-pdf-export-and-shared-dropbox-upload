@@ -10,7 +10,25 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface BinaryField {
+  'id' : string,
+  'value' : FieldValue,
+  'description' : string,
+}
+export interface ChecklistSection {
+  'id' : string,
+  'description' : string,
+  'binaryFields' : Array<BinaryField>,
+  'yesNoFields' : Array<YesNoField>,
+  'textFields' : Array<TextField>,
+}
 export type DropboxToken = string;
+export type FieldValue = { 'no' : null } |
+  { 'yes' : null } |
+  { 'noAnswer' : null } |
+  { 'notAppicable' : null } |
+  { 'text' : string } |
+  { 'notTested' : null };
 export interface MetadataAndPdf { 'pdf' : PdfBinary, 'metadata' : PdfMetadata }
 export type PdfBinary = Uint8Array;
 export interface PdfEntry {
@@ -20,12 +38,23 @@ export interface PdfEntry {
 }
 export interface PdfMetadata { 'uploadTimestamp' : bigint }
 export type Room = string;
+export interface RoomChecklist { 'checklistSections' : Array<ChecklistSection> }
+export interface TextField {
+  'id' : string,
+  'value' : FieldValue,
+  'description' : string,
+}
 export type UploadResult = { 'error' : string } |
   { 'success' : string };
 export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
+export interface YesNoField {
+  'id' : string,
+  'value' : FieldValue,
+  'description' : string,
+}
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'areAdminPrivilegesAvailable' : ActorMethod<[], boolean>,
@@ -36,9 +65,11 @@ export interface _SERVICE {
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getDropboxToken' : ActorMethod<[], [] | [DropboxToken]>,
   'getPdf' : ActorMethod<[Room], MetadataAndPdf>,
+  'getRoomChecklist' : ActorMethod<[Room], [] | [RoomChecklist]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'saveRoomChecklist' : ActorMethod<[Room, RoomChecklist], UploadResult>,
   'setDropboxToken' : ActorMethod<[DropboxToken], undefined>,
   'uploadPdf' : ActorMethod<[Room, PdfBinary, bigint], UploadResult>,
 }
