@@ -244,22 +244,6 @@ export default function ChecklistFormPage() {
                     />
                   </div>
                 </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="scaleBuildup"
-                    checked={formData.section1.scaleBuildup}
-                    onCheckedChange={(checked) =>
-                      updateField("section1", {
-                        ...formData.section1,
-                        scaleBuildup: !!checked,
-                      })
-                    }
-                  />
-                  <Label htmlFor="scaleBuildup" className="font-medium">
-                    Scale Buildup – Check for mineral deposits or scale buildup
-                  </Label>
-                </div>
               </div>
             </ChecklistSection>
 
@@ -537,7 +521,7 @@ export default function ChecklistFormPage() {
                       }
                     />
                     <YesNoField
-                      label='1" rear caulk opening verified'
+                      label="Spillage from rear caulk opening"
                       value={formData.section3.toiletFlushTest.rearCaulkLeakage}
                       onChange={(value) =>
                         updateField("section3", {
@@ -596,7 +580,7 @@ export default function ChecklistFormPage() {
 
                 {/* Washer Drain Secured */}
                 <YesNoField
-                  label="Is the washer drain properly secured in the drain pipe?"
+                  label="Is the washer drain properly secured in the drain pipe - If Applicable"
                   value={formData.section3.washerDrainSecured}
                   onChange={(value) =>
                     updateField("section3", {

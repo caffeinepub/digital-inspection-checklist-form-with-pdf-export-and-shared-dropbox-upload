@@ -27,7 +27,7 @@ function generatePdfContent(data: ChecklistFormData): string {
   content += "1. ENTRY & INITIAL CONDITIONS (First 2 Minutes)\n";
   content += `[${data.section1.roomOdor.checked ? "X" : " "}] Room Odor: ${data.section1.roomOdor.observation || "N/A"}\n`;
   content += `[${data.section1.thermostatCheck.checked ? "X" : " "}] Thermostat Check - Set Temp: ${data.section1.thermostatCheck.setTemp || "N/A"}, Matches: ${data.section1.thermostatCheck.matchesActual || "N/A"}\n`;
-  content += `[${data.section1.scaleBuildup ? "X" : " "}] Scale Buildup in shower wand\n\n`;
+  content += "\n";
 
   content += "2. LIGHTING & ELECTRICAL (3 Minutes)\n";
   content += `[${data.section2.lightSwitches ? "X" : " "}] Light Switches tested\n`;
@@ -47,11 +47,11 @@ function generatePdfContent(data: ChecklistFormData): string {
   content += "Toilet Flush Test:\n";
   content += `  Flush operation: ${data.section3.toiletFlushTest.flushOperation || "N/A"}\n`;
   content += `  Secure at base: ${data.section3.toiletFlushTest.secureAtBase || "N/A"}\n`;
-  content += `  1" rear caulk opening verified: ${data.section3.toiletFlushTest.rearCaulkLeakage || "N/A"}\n`;
+  content += `  Spillage from rear caulk opening: ${data.section3.toiletFlushTest.rearCaulkLeakage || "N/A"}\n`;
   content += `  Toilet tank is free of cracks/leaks: ${data.section3.toiletTankFreeOfCracks || "N/A"}\n`;
   content += `[${data.section3.rearCaulkOpening ? "X" : " "}] 1" rear caulk opening verified\n`;
   content += `[${data.section3.bathroomGFCI ? "X" : " "}] Bathroom GFCI Protection verified\n`;
-  content += `Washer drain properly secured in drain pipe: ${data.section3.washerDrainSecured || "N/A"}\n\n`;
+  content += `Washer drain properly secured in drain pipe - If Applicable: ${data.section3.washerDrainSecured || "N/A"}\n\n`;
 
   content += "4. WATER, MOLD & MOISTURE CHECKS (5 Minutes)\n";
   content += `[${data.section4.underSinksDry ? "X" : " "}] Under sinks dry (check for water marks, leaks from shut off valves or faucet connections)\n`;

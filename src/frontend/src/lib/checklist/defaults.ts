@@ -16,7 +16,6 @@ export function getDefaultChecklistData(): ChecklistFormData {
         setTemp: "",
         matchesActual: "",
       },
-      scaleBuildup: false,
     },
 
     section2: {

@@ -13,7 +13,6 @@ export interface ChecklistFormData {
       setTemp: string;
       matchesActual: "yes" | "no" | "";
     };
-    scaleBuildup: boolean;
   };
 
   section2: {
